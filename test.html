@@ -1,0 +1,31 @@
+<!-- Simple HTML page for testing POSTing data -->
+<!DOCTYPE html>
+<html>
+  <body>
+    <h3>Send Resume Data</h3>
+    <button onclick="sendResume()">Send</button>
+
+    <script>
+      async function sendResume() {
+        const resume = {
+          name: "Jane Doe",
+          contact: "test@example.com",
+          linkedin: "https://linkedin.com/in/test",
+          github: "https://github.com/test",
+          experience: []
+        };
+
+        const res = await fetch('http://localhost:3000/resume', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(resume)
+        });
+
+        const data = await res.json();
+        alert(JSON.stringify(data));
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Resume Editor</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <script src="/script.js"></script>
+  <div class="container">
+  <div class="resume-section" data-section="name">
+    <h1 contenteditable="true" id="name">Your Name</h1>
+
+    <div class="section">
+      <label>Contact: </label>
+      <span contenteditable="true" id="contact">email@example.com</span>
+    </div>
+    <div class="section">
+      <label>GitHub: </label>
+      <span contenteditable="true" id="github">https://github.com/you</span>
+    </div>
+    <div class="section">
+      <label>LinkedIn: </label>
+      <span contenteditable="true" id="linkedin">https://linkedin.com/in/you</span>
+    </div>
+  </div>
+
+  <div class="resume-section" data-section="experience">
+    <h2>Experience</h2>
+    <div id="experience-list"></div>
+    <button onclick="addExperience()">+ Add Experience</button>
+  </div>
+
+  <div class="resume-section" data-section="projects">
+    <h2>Projects</h2>
+    <div id="project-list"></div>
+    <button onclick="addProject()">+ Add Project</button>
+  </div>
+
+  <hr>
+  <button onclick="saveResume()">💾 Save Resume</button>
+</div>
+
+
+
+
+  
+</body>
+</html>
