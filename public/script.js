@@ -1,72 +1,112 @@
 let experienceList = document.getElementById('experience-list');
-
-function addExperience(exp = null) {
+// When adding experiences to the list, ensure they are clickable to edit
+function addExperience(exp) {
+  const experienceList = document.getElementById('experience-list');
   const container = document.createElement('div');
   container.className = 'experience-entry';
-  container.draggable = true;
+  container.setAttribute('data-id', Date.now()); // Unique ID for editing later
 
-  const titleInput = document.createElement('input');
-  titleInput.placeholder = 'Job Title';
-  titleInput.value = exp?.title || '';
+  const title = document.createElement('h4');
+  title.className = 'experience-title';
+  title.textContent = `${exp.title} - ${exp.company}`;
+  title.onclick = () => openModal('experience', exp);  // Enable clicking to edit
+  container.appendChild(title);
 
-  const companyInput = document.createElement('input');
-  companyInput.placeholder = 'Company';
-  companyInput.value = exp?.company || '';
+  const date = document.createElement('p');
+  date.className = 'experience-dates';
+  date.textContent = exp.dates;
+  container.appendChild(date);
 
-  const dateInput = document.createElement('input');
-  dateInput.placeholder = 'Dates';
-  dateInput.value = exp?.dates || '';
-
-  const bulletList = document.createElement('ul');
-  bulletList.className = 'bullets';
-
-  (exp?.bullets || []).forEach(bullet => {
+  const bullets = document.createElement('ul');
+  bullets.className = 'experience-bullets';
+  exp.bullets.forEach(bullet => {
     const li = document.createElement('li');
-    li.contentEditable = true;
     li.textContent = bullet;
-    bulletList.appendChild(li);
+    bullets.appendChild(li);
+  });
+  container.appendChild(bullets);
+
+  // Make experience entry clickable to open modal
+  container.addEventListener('click', () => {
+    openModal('experience', exp);
   });
 
-  const addBulletBtn = document.createElement('button');
-  addBulletBtn.textContent = '+ Add Bullet';
-  addBulletBtn.onclick = () => {
-    const li = document.createElement('li');
-    li.contentEditable = true;
-    li.textContent = 'New bullet point';
-    bulletList.appendChild(li);
-  };
-
-  container.appendChild(titleInput);
-  container.appendChild(companyInput);
-  container.appendChild(dateInput);
-  container.appendChild(bulletList);
-  container.appendChild(addBulletBtn);
-
-  // drag & drop handlers
-  container.addEventListener('dragstart', e => {
-    dragSrcEl = container;
-    e.dataTransfer.effectAllowed = 'move';
-  });
-
-  container.addEventListener('dragover', e => {
-    e.preventDefault();
-    container.classList.add('drag-over');
-  });
-
-  container.addEventListener('dragleave', () => {
-    container.classList.remove('drag-over');
-  });
-
-  container.addEventListener('drop', e => {
-    e.stopPropagation();
-    container.classList.remove('drag-over');
-    if (dragSrcEl !== container) {
-      experienceList.insertBefore(dragSrcEl, container);
-    }
-  });
 
   experienceList.appendChild(container);
 }
+let draggedElement = null;
+
+function dragStart(e) {
+  draggedElement = e.target;
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", "");
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+}
+
+function dragEnter(e) {
+  e.preventDefault();
+  e.target.classList.add('drag-over');
+}
+
+function dragLeave(e) {
+  e.target.classList.remove('drag-over');
+}
+
+function drop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  e.target.classList.remove('drag-over');
+
+  const container = document.getElementById('exp-bullets-container');
+  if (draggedElement && e.target !== draggedElement) {
+    const allInputs = Array.from(container.querySelectorAll('.bullet-point-input'));
+    const draggedIndex = allInputs.indexOf(draggedElement);
+    const dropIndex = allInputs.indexOf(e.target);
+
+    if (draggedIndex > -1 && dropIndex > -1) {
+      container.removeChild(draggedElement);
+      if (dropIndex < draggedIndex) {
+        container.insertBefore(draggedElement, e.target);
+      } else {
+        container.insertBefore(draggedElement, e.target.nextSibling);
+      }
+    }
+  }
+
+  draggedElement = null;
+}
+
+function dragEnd() {
+  const inputs = document.querySelectorAll('.bullet-point-input');
+  inputs.forEach(input => input.classList.remove('drag-over'));
+}
+
+function addExperienceBulletPoint(initialValue = "") {
+  const container = document.getElementById('exp-bullets-container');
+  if (!container) {
+    console.error("bullet-container not found");
+    return;
+  }
+
+  const bullet = document.createElement('input');
+  bullet.type = 'text';
+  bullet.className = 'bullet-point-input';
+  bullet.value = initialValue;
+  bullet.setAttribute('draggable', 'true');
+
+  bullet.addEventListener('dragstart', dragStart);
+  bullet.addEventListener('dragover', dragOver);
+  bullet.addEventListener('drop', drop);
+
+  container.appendChild(bullet);
+}
+
+
 
 
 function saveResume() {
@@ -94,9 +134,11 @@ function saveResume() {
   console.log("Saved Resume JSON:", resume);
   alert("Resume saved to console. Copy it or send to backend.");
 }
+// This will store the experience currently being edited
+let editingExperience = null;
 
-// Open the modal to add Experience or Project
-function openModal(type) {
+// Open the modal to either add or edit Experience/Project
+function openModal(type, experience = null) {
   const modal = document.getElementById('add-modal');
   const experienceForm = document.getElementById('experience-form');
   const projectForm = document.getElementById('project-form');
@@ -105,7 +147,34 @@ function openModal(type) {
   if (type === 'experience') {
     experienceForm.style.display = 'block';
     projectForm.style.display = 'none';
-    modalTitle.textContent = 'Add Experience';
+    modalTitle.textContent = experience ? 'Edit Experience' : 'Add Experience';
+
+    // Pre-fill fields if editing
+    if (experience) {
+      editingExperience = experience; // Store the experience being edited
+      document.getElementById('exp-title').value = experience.title;
+      document.getElementById('exp-company').value = experience.company;
+      document.getElementById('exp-dates').value = experience.dates;
+
+      // Populate bullets
+      const bulletsContainer = document.getElementById('exp-bullets-container');
+      bulletsContainer.innerHTML = ''; // Clear existing bullet points
+      experience.bullets.forEach(bullet => {
+        const bulletInput = document.createElement('input');
+        bulletInput.type = 'text';
+        bulletInput.className = 'bullet-point-input';
+        bulletInput.value = bullet;
+        bulletInput.setAttribute('draggable', 'true');
+        bulletInput.addEventListener('dragstart', dragStart);
+        bulletInput.addEventListener('dragover', dragOver);
+        bulletInput.addEventListener('dragenter', dragEnter);
+        bulletInput.addEventListener('dragleave', dragLeave);
+        bulletInput.addEventListener('drop', drop);
+        bulletInput.addEventListener('dragend', dragEnd);
+
+        bulletsContainer.appendChild(bulletInput);
+      });
+    }
   } else {
     experienceForm.style.display = 'none';
     projectForm.style.display = 'block';
@@ -119,178 +188,10 @@ function openModal(type) {
 function closeModal() {
   const modal = document.getElementById('add-modal');
   modal.style.display = 'none';
+  editingExperience = null; // Reset editing experience
 }
 
-// Submit Experience Form
-function submitExperience() {
-  const title = document.getElementById('exp-title').value;
-  const company = document.getElementById('exp-company').value;
-  const startDate = document.getElementById('start-date').value;
-  const endDate = document.getElementById('end-date').value;
-  const bullets = document.getElementById('exp-bullets').value.split('\n');
-
-  const experience = {
-    title,
-    company,
-    startDate,
-    endDate,
-    bullets,
-  };
-
-  addExperience(experience);
-  closeModal();
-}
-
-// Submit Project Form
-function submitProject() {
-  const name = document.getElementById('proj-name').value;
-  const startDate = document.getElementById('proj-startDate').value;
-  const endDate = document.getElementById('proj-endDate').value;
-  const description = document.getElementById('proj-description').value;
-  const highlights = document.getElementById('proj-highlights').value.split(',');
-  const url = document.getElementById('proj-url').value;
-
-  const project = {
-    name,
-    startDate,
-    endDate,
-    description,
-    highlights,
-    url,
-  };
-
-  addProject(project);
-  closeModal();
-}
-
-// Add Experience to the List
-function addExperience(exp) {
-  const experienceList = document.getElementById('experience-list');
-
-  const container = document.createElement('div');
-  container.className = 'experience-entry';
-
-  const title = document.createElement('h4');
-  title.textContent = `${exp.title} - ${exp.company}`;
-  container.appendChild(title);
-
-  const date = document.createElement('p');
-  date.textContent = exp.dates;
-  container.appendChild(date);
-
-  const bullets = document.createElement('ul');
-  exp.bullets.forEach(bullet => {
-    const li = document.createElement('li');
-    li.textContent = bullet;
-    bullets.appendChild(li);
-  });
-  container.appendChild(bullets);
-
-  experienceList.appendChild(container);
-}
-
-// Add Project to the List
-function addProject(proj) {
-  const projectList = document.getElementById('project-list');
-
-  const container = document.createElement('div');
-  container.className = 'project-entry';
-
-  const name = document.createElement('h4');
-  name.textContent = proj.name;
-  container.appendChild(name);
-
-  const dates = document.createElement('p');
-  dates.textContent = `${proj.startDate} - ${proj.endDate}`;
-  container.appendChild(dates);
-
-  const description = document.createElement('p');
-  description.textContent = proj.description;
-  container.appendChild(description);
-
-  const highlights = document.createElement('ul');
-  proj.highlights.forEach(highlight => {
-    const li = document.createElement('li');
-    li.textContent = highlight;
-    highlights.appendChild(li);
-  });
-  container.appendChild(highlights);
-
-  const url = document.createElement('a');
-  url.href = proj.url;
-  url.textContent = 'Visit Project';
-  url.target = '_blank';
-  container.appendChild(url);
-
-  projectList.appendChild(container);
-}
-
-/// Add Bullet Point Input
-function addBulletPoint() {
-  const container = document.getElementById('exp-bullets-container');
-
-  // Create new bullet point input
-  const bulletInput = document.createElement('input');
-  bulletInput.type = 'text';
-  bulletInput.className = 'bullet-point-input';
-  bulletInput.placeholder = 'Enter bullet point...';
-  bulletInput.value = ''; // Empty by default
-
-  bulletInput.setAttribute('draggable', 'true');
-
-  // Add event listeners for drag-and-drop
-  bulletInput.addEventListener('dragstart', dragStart);
-  bulletInput.addEventListener('dragover', dragOver);
-  bulletInput.addEventListener('dragenter', dragEnter);
-  bulletInput.addEventListener('dragleave', dragLeave);
-  bulletInput.addEventListener('drop', drop);
-  bulletInput.addEventListener('dragend', dragEnd);
-
-  container.appendChild(bulletInput);
-}
-
-// Handle drag start
-function dragStart(e) {
-  this.style.opacity = '0.4';
-  draggedItem = this; // Store the dragged element
-}
-
-// Handle drag over (needed to allow dropping)
-function dragOver(e) {
-  e.preventDefault();
-  this.style.border = '2px dashed #007bff';
-}
-
-// Handle drag enter (optional visual feedback)
-function dragEnter(e) {
-  e.preventDefault();
-}
-
-// Handle drag leave (reset styles)
-function dragLeave() {
-  this.style.border = '';
-}
-
-// Handle drop and reorder
-function drop(e) {
-  e.stopPropagation();
-  this.style.border = ''; // Reset border
-  if (draggedItem !== this) {
-    const container = document.getElementById('exp-bullets-container');
-    container.insertBefore(draggedItem, this);
-  }
-}
-
-// Handle drag end
-function dragEnd() {
-  this.style.opacity = '1';
-  const allBulletPoints = document.querySelectorAll('.bullet-point-input');
-  allBulletPoints.forEach(input => {
-    input.style.border = '';
-  });
-}
-
-// Submit Experience with updated bullets
+// Submit Experience Form (Add or Edit)
 function submitExperience() {
   const title = document.getElementById('exp-title').value;
   const company = document.getElementById('exp-company').value;
@@ -309,25 +210,52 @@ function submitExperience() {
     bullets: bulletPoints
   };
 
-  addExperience(experience);
+  // If editing, update the existing experience
+  if (editingExperience) {
+    updateExperience(experience);
+  } else {
+    addExperience(experience); // If adding, add a new one
+  }
+
   closeModal();
 }
 
-// Add Experience to the list in the main section
+// Update Experience in the List
+function updateExperience(updatedExperience) {
+  const experienceList = document.getElementById('experience-list');
+  const existingEntry = document.querySelector(`[data-id="${updatedExperience.id}"]`);
+  
+  existingEntry.querySelector('.experience-title').textContent = `${updatedExperience.title} - ${updatedExperience.company}`;
+  existingEntry.querySelector('.experience-dates').textContent = updatedExperience.dates;
+  
+  const bulletsContainer = existingEntry.querySelector('.experience-bullets');
+  bulletsContainer.innerHTML = ''; // Clear existing bullets
+  updatedExperience.bullets.forEach(bullet => {
+    const li = document.createElement('li');
+    li.textContent = bullet;
+    bulletsContainer.appendChild(li);
+  });
+}
+
+// Add New Experience to the List
 function addExperience(exp) {
   const experienceList = document.getElementById('experience-list');
   const container = document.createElement('div');
   container.className = 'experience-entry';
+  container.setAttribute('data-id', Date.now()); // Unique ID for editing later
 
   const title = document.createElement('h4');
+  title.className = 'experience-title';
   title.textContent = `${exp.title} - ${exp.company}`;
   container.appendChild(title);
 
   const date = document.createElement('p');
+  date.className = 'experience-dates';
   date.textContent = exp.dates;
   container.appendChild(date);
 
   const bullets = document.createElement('ul');
+  bullets.className = 'experience-bullets';
   exp.bullets.forEach(bullet => {
     const li = document.createElement('li');
     li.textContent = bullet;
@@ -335,7 +263,18 @@ function addExperience(exp) {
   });
   container.appendChild(bullets);
 
+  // Add edit button
+  const editButton = document.createElement('button');
+  editButton.textContent = 'Edit';
+  editButton.onclick = () => openModal('experience', exp);
+  container.appendChild(editButton);
+
   experienceList.appendChild(container);
+}
+
+// Open Modal for Editing
+function openExperienceModal(experience) {
+  openModal('experience', experience);
 }
 
 
