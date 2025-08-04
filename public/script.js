@@ -106,9 +106,6 @@ function addExperienceBulletPoint(initialValue = "") {
   container.appendChild(bullet);
 }
 
-
-
-
 function saveResume() {
   const resume = {
     name: document.getElementById('name').textContent.trim(),
@@ -120,15 +117,17 @@ function saveResume() {
 
   const entries = document.querySelectorAll('.experience-entry');
   entries.forEach(entry => {
-    const title = entry.children[0].value;
-    const company = entry.children[1].value;
-    const dates = entry.children[2].value;
+    console.log("Processing entry:", entry);
+    const title = entry.children[0].textContent;
+    const company = entry.children[1].textContent;
+    const startDate = entry.children[2].textContent;  // TODO
+    const endDate = entry.children[3].textContent;  // TODO
     const bullets = [];
 
     const bulletItems = entry.querySelectorAll('li');
     bulletItems.forEach(li => bullets.push(li.textContent.trim()));
 
-    resume.experience.push({ title, company, dates, bullets });
+    resume.experience.push({ title, company, startDate, endDate, bullets });
   });
 
   console.log("Saved Resume JSON:", resume);
@@ -256,10 +255,15 @@ function addExperience(exp) {
   title.textContent = `${exp.title} - ${exp.company}`;
   container.appendChild(title);
 
-  const date = document.createElement('p');
-  date.className = 'experience-dates';
-  date.textContent = exp.dates;
-  container.appendChild(date);
+  const startDate = document.createElement('p');
+  startDate.className = 'experience-startdate';
+  startDate.textContent = exp.startDate;
+  container.appendChild(startDate);
+
+  const endDate = document.createElement('p');
+  endDate.className = 'experience-enddate';
+  endDate.textContent = exp.endDate;
+  container.appendChild(endDate);
 
   const bullets = document.createElement('ul');
   bullets.className = 'experience-bullets';
