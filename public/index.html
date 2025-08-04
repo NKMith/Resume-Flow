@@ -28,19 +28,72 @@
   <div class="resume-section" data-section="experience">
     <h2>Experience</h2>
     <div id="experience-list"></div>
-    <button onclick="addExperience()">+ Add Experience</button>
+    <button onclick="openModal('experience')">+ Add Experience</button>
   </div>
 
   <div class="resume-section" data-section="projects">
     <h2>Projects</h2>
     <div id="project-list"></div>
-    <button onclick="addProject()">+ Add Project</button>
+    <button onclick="openModal('project')">+ Add Project</button>
   </div>
 
   <hr>
   <button onclick="saveResume()">💾 Save Resume</button>
 </div>
 
+<!-- Modal for adding Experience or Project -->
+<div id="add-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+
+    <h3 id="modal-title">Add Experience</h3>
+
+    <!-- Add Experience Form -->
+    <div id="experience-form" class="form">
+      <label for="exp-title">Title:</label>
+      <input type="text" id="exp-title" placeholder="e.g. Frontend Developer" required>
+
+      <label for="exp-company">Company:</label>
+      <input type="text" id="exp-company" placeholder="e.g. WebCo" required>
+
+      <label for="exp-dates">Dates:</label>
+      <input type="text" id="exp-dates" placeholder="e.g. 2022 - Present" required>
+
+      <label for="exp-bullets">Bullet Points:</label>
+      <div id="exp-bullets-container" class="bullets-container">
+        <!-- Dynamic Bullet Point Inputs will appear here -->
+      </div>
+
+      <button onclick="addBulletPoint()">+ Add Bullet Point</button>
+      <button onclick="submitExperience()">Add Experience</button>
+    </div>
+
+
+
+    <!-- Add Project Form -->
+    <div id="project-form" class="form" style="display: none;">
+      <label for="proj-name">Project Name:</label>
+      <input type="text" id="proj-name" placeholder="Project Name" required>
+
+      <label for="proj-startDate">Start Date:</label>
+      <input type="date" id="proj-startDate" required>
+
+      <label for="proj-endDate">End Date:</label>
+      <input type="date" id="proj-endDate" required>
+
+      <label for="proj-description">Description:</label>
+      <textarea id="proj-description" placeholder="Project description..." required></textarea>
+
+      <label for="proj-highlights">Highlights (comma separated):</label>
+      <input type="text" id="proj-highlights" placeholder="e.g. Won award at AIHacks 2016" required>
+
+      <label for="proj-url">Project URL:</label>
+      <input type="url" id="proj-url" placeholder="e.g. https://project.com/" required>
+
+      <button onclick="submitProject()">Add Project</button>
+    </div>
+  </div>
+</div>
 
 
 
