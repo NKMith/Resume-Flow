@@ -14,7 +14,7 @@ function addExperience(exp) {
 
   const date = document.createElement('p');
   date.className = 'experience-dates';
-  date.textContent = exp.dates;
+  date.textContent = `${exp.startDate} to ${exp.endDate}`;
   container.appendChild(date);
 
   const bullets = document.createElement('ul');
@@ -154,7 +154,9 @@ function openModal(type, experience = null) {
       editingExperience = experience; // Store the experience being edited
       document.getElementById('exp-title').value = experience.title;
       document.getElementById('exp-company').value = experience.company;
-      document.getElementById('exp-dates').value = experience.dates;
+      document.getElementById('exp-start-date').value = experience.startDate || '';
+      document.getElementById('exp-end-date').value = experience.endDate || '';
+
 
       // Populate bullets
       const bulletsContainer = document.getElementById('exp-bullets-container');
@@ -195,7 +197,9 @@ function closeModal() {
 function submitExperience() {
   const title = document.getElementById('exp-title').value;
   const company = document.getElementById('exp-company').value;
-  const dates = document.getElementById('exp-dates').value;
+  const startDate = document.getElementById('exp-start-date').value;
+  const endDate = document.getElementById('exp-end-date').value;
+
   
   const bulletPoints = [];
   const bulletElements = document.querySelectorAll('#exp-bullets-container .bullet-point-input');
@@ -206,9 +210,11 @@ function submitExperience() {
   const experience = {
     title,
     company,
-    dates,
+    startDate,
+    endDate,
     bullets: bulletPoints
   };
+
 
   // If editing, update the existing experience
   if (editingExperience) {
@@ -226,7 +232,8 @@ function updateExperience(updatedExperience) {
   const existingEntry = document.querySelector(`[data-id="${updatedExperience.id}"]`);
   
   existingEntry.querySelector('.experience-title').textContent = `${updatedExperience.title} - ${updatedExperience.company}`;
-  existingEntry.querySelector('.experience-dates').textContent = updatedExperience.dates;
+  existingEntry.querySelector('.experience-dates').textContent = `${updatedExperience.startDate} to ${updatedExperience.endDate}`;
+
   
   const bulletsContainer = existingEntry.querySelector('.experience-bullets');
   bulletsContainer.innerHTML = ''; // Clear existing bullets

@@ -56,8 +56,14 @@
       <label for="exp-company">Company:</label>
       <input type="text" id="exp-company" placeholder="e.g. WebCo" required>
 
-      <label for="exp-dates">Dates:</label>
-      <input type="text" id="exp-dates" placeholder="e.g. 2022 - Present" required>
+      <div class="date-fields">
+        <label for="exp-start-date">Start Date:</label>
+        <input type="date" id="exp-start-date" placeholder="e.g. 2002-12-04" required>
+
+        <label for="exp-end-date">End Date:</label>
+        <input type="date" id="exp-end-date" placeholder="e.g. 2004-11-01">
+      </div>
+
 
       <label for="exp-bullets">Bullet Points:</label>
       <div id="exp-bullets-container" class="bullets-container">

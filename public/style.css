@@ -68,6 +68,16 @@ button:hover {
 }
 
 
+.date-fields {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.date-fields label {
+  margin-right: 0.5rem;
+}
+
 .resume-section {
   padding: 1rem;
   border: 1px dashed #aaa;
