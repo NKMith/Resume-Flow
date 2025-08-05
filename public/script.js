@@ -3,8 +3,11 @@ let experienceList = document.getElementById('experience-list');
 function addExperience(exp) {
   const experienceList = document.getElementById('experience-list');
   const container = document.createElement('div');
+
+  const id = Date.now();
+  exp.id = id; // store id in the object
   container.className = 'experience-entry';
-  container.setAttribute('data-id', Date.now()); // Unique ID for editing later
+  container.setAttribute('data-id', id); // Unique ID for editing later
 
   const title = document.createElement('h4');
   title.className = 'experience-title';
@@ -143,6 +146,7 @@ function openModal(type, experience = null) {
   const projectForm = document.getElementById('project-form');
   const modalTitle = document.getElementById('modal-title');
 
+
   if (type === 'experience') {
     experienceForm.style.display = 'block';
     projectForm.style.display = 'none';
@@ -150,7 +154,9 @@ function openModal(type, experience = null) {
 
     // Pre-fill fields if editing
     if (experience) {
-      editingExperience = experience; // Store the experience being edited
+      // editingExperience = experience; // Store the experience being edited
+      editingExperience = { ...experience }; // copy
+      editingExperience.id = experience.id;  // ensure id is kept
       document.getElementById('exp-title').value = experience.title;
       document.getElementById('exp-company').value = experience.company;
       document.getElementById('exp-start-date').value = experience.startDate || '';
@@ -215,33 +221,34 @@ function submitExperience() {
   };
 
 
-  // If editing, update the existing experience
-  if (editingExperience) {
+  if (editingExperience && editingExperience.id) {
+    experience.id = editingExperience.id; // keep original id
     updateExperience(experience);
   } else {
-    addExperience(experience); // If adding, add a new one
+    addExperience(experience);
   }
 
   closeModal();
 }
 
-// Update Experience in the List
 function updateExperience(updatedExperience) {
-  const experienceList = document.getElementById('experience-list');
   const existingEntry = document.querySelector(`[data-id="${updatedExperience.id}"]`);
-  
-  existingEntry.querySelector('.experience-title').textContent = `${updatedExperience.title} - ${updatedExperience.company}`;
-  existingEntry.querySelector('.experience-dates').textContent = `${updatedExperience.startDate} to ${updatedExperience.endDate}`;
+  if (!existingEntry) return;
 
-  
+  existingEntry.querySelector('.experience-title').textContent =
+    `${updatedExperience.title} - ${updatedExperience.company}`;
+  existingEntry.querySelector('.experience-startdate').textContent = updatedExperience.startDate;
+  existingEntry.querySelector('.experience-enddate').textContent = updatedExperience.endDate;
+
   const bulletsContainer = existingEntry.querySelector('.experience-bullets');
-  bulletsContainer.innerHTML = ''; // Clear existing bullets
+  bulletsContainer.innerHTML = '';
   updatedExperience.bullets.forEach(bullet => {
     const li = document.createElement('li');
     li.textContent = bullet;
     bulletsContainer.appendChild(li);
   });
 }
+
 
 // Add New Experience to the List
 function addExperience(exp) {
@@ -287,44 +294,3 @@ function addExperience(exp) {
 function openExperienceModal(experience) {
   openModal('experience', experience);
 }
-
-
-// // ========== SECTION DRAGGING ==========
-// let dragSrcEl = null;
-
-// document.querySelectorAll('.resume-section').forEach(section => {
-//   section.addEventListener('dragstart', e => {
-//     dragSrcEl = section;
-//     e.dataTransfer.effectAllowed = 'move';
-//   });
-
-//   section.addEventListener('dragover', e => {
-//     e.preventDefault(); // Needed for drop to work
-//     section.classList.add('drag-over');
-//   });
-
-//   section.addEventListener('dragleave', () => {
-//     section.classList.remove('drag-over');
-//   });
-
-//   section.addEventListener('drop', e => {
-//     e.stopPropagation();
-//     section.classList.remove('drag-over');
-
-//     if (dragSrcEl !== section) {
-//       const container = document.querySelector('.container');
-//       container.insertBefore(dragSrcEl, section);
-//     }
-//   });
-// });
-
-// function loadResume(data) {
-//   document.getElementById('name').textContent = data.name;
-//   document.getElementById('contact').textContent = data.contact;
-//   document.getElementById('github').textContent = data.github;
-//   document.getElementById('linkedin').textContent = data.linkedin;
-
-//   // Clear and reload experiences
-//   experienceList.innerHTML = '';
-//   data.experience.forEach(exp => addExperience(exp));
-// }
