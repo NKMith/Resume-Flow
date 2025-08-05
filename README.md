@@ -1,5 +1,5 @@
 # Resume Flow
-App for centralizing and organizing your resume data in one place, using [JSONResume](https://jsonresume.org/) to store data.
+App for centralizing and organizing your resume data in one place, using [JSONResume](https://jsonresume.org/) to store data. 
 
 Instructions for setup:
 
