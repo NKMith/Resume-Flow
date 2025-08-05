@@ -1,7 +1,9 @@
+# Resume Flow
+App for centralizing and organizing your resume data in one place, using [JSONResume](https://jsonresume.org/) to store data.
+
 Instructions for setup:
 
-1. Open up the "resume-flow" project directory
-2. Run `npm install`
+1. Run `npm install`
 
 You should now be set. To run, you just need to run the following command
 
