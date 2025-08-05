@@ -7,7 +7,7 @@ You should now be set. To run, you just need to run the following command
 
 - `npm run dev` - which will host the website locally
 
-To have this accessible via Github Pages, I'd recommend looking into website deployment (with React)
+To have this accessible via Github Pages, I'd recommend looking into website deployment (with React) (with github pages probably as well, its different from hosting the website urself)
 
 # React + TypeScript + Vite
 
