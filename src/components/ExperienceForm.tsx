@@ -31,6 +31,13 @@ export const ExperienceForm: React.FC<Props> = ({ initialData, onSave }) => {
     setBullets(updated);
   };
 
+const deleteBullet = (index: number) => {
+  const updated = [...bullets];
+  updated.splice(index, 1);
+  setBullets(updated);
+};
+
+
   const handleDragStart = (index: number) => {
     setDragIndex(index);
   };
@@ -78,8 +85,8 @@ export const ExperienceForm: React.FC<Props> = ({ initialData, onSave }) => {
       <label>Bullet Points</label>
       <div className="bullets-container">
         {bullets.map((bullet, i) => (
+        <div key={i} className="bullet-wrapper">
           <input
-            key={i}
             draggable
             onDragStart={() => handleDragStart(i)}
             onDragOver={handleDragOver}
@@ -88,7 +95,17 @@ export const ExperienceForm: React.FC<Props> = ({ initialData, onSave }) => {
             onChange={(e) => updateBullet(i, e.target.value)}
             className="bullet-point-input"
           />
-        ))}
+          <button
+            type="button"
+            // className="delete-bullet-btn"
+            className="delete-bullet-btn"
+            onClick={() => deleteBullet(i)}
+          >
+            🗑️
+          </button>
+        </div>
+      ))}
+
       </div>
       <button type="button" onClick={addBullet}>+ Add Bullet Point</button>
 

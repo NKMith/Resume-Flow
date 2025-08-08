@@ -240,3 +240,74 @@ input {
   border-radius: 5px;
   border: 1px solid #ccc;
 }
+
+.bullet-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* INPUT */
+.bullet-point-input {
+  flex: 1;
+  height: 36px;
+  /* padding: 4px 10px; */
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+/* TRASH BUTTON */
+.trash-btn {
+  height: 36px;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.delete-bullet-btn {
+  height: 36px;
+  width: 36px;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #cc0000;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.bullets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bullet-line {
+  display: flex;
+  align-items: center;
+}
+
+.bullet-point-input {
+  flex: 1;
+  padding: 8px;
+  font-size: 14px;
+  height: 36px;
+  align-items: center;
+}
