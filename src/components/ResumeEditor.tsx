@@ -18,43 +18,74 @@ export const ResumeEditor: React.FC = () => {
   const [editingExp, setEditingExp] = useState<Experience | null>(null);
 
   const handleSaveExperience = (exp: Experience) => {
-    // useState: if you pass a function to the update function, REact will call it with most recent value of resume
     setResume((prev) => {
       const exists = prev.experience.some((e) => e.id === exp.id);
       const updatedExperience = exists
-        ? prev.experience.map((e) => e.id === exp.id ? exp : e) // find the updated experience and update its value
-        : [...prev.experience, exp]; // else just make a new experience
+        ? prev.experience.map((e) => e.id === exp.id ? exp : e)
+        : [...prev.experience, exp];
       return { ...prev, experience: updatedExperience };
     });
     setIsModalOpen(false);
     setEditingExp(null);
   };
 
+  const handleFieldChange = (field: keyof Resume, value: string) => {
+    setResume((prev) => ({ ...prev, [field]: value }));
+  };
+
   const saveResume = () => {
+    // At this point, resume already has the latest state values
     console.log("Resume JSON:", resume);
     alert("Resume saved to console.");
   };
-  console.log("Modal open?", isModalOpen);
+
   return (
     <div className="container">
       <div>
-        <h1 contentEditable suppressContentEditableWarning>{resume.name}</h1>
+        <h1
+          contentEditable
+          suppressContentEditableWarning
+          onBlur={(e) => handleFieldChange("name", e.currentTarget.textContent || "")}
+        >
+          {resume.name}
+        </h1>
         <div>
           <label>Contact: </label>
-          <span contentEditable suppressContentEditableWarning>{resume.contact}</span>
+          <span
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => handleFieldChange("contact", e.currentTarget.textContent || "")}
+          >
+            {resume.contact}
+          </span>
         </div>
         <div>
           <label>GitHub: </label>
-          <span contentEditable suppressContentEditableWarning>{resume.github}</span>
+          <span
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => handleFieldChange("github", e.currentTarget.textContent || "")}
+          >
+            {resume.github}
+          </span>
         </div>
         <div>
           <label>LinkedIn: </label>
-          <span contentEditable suppressContentEditableWarning>{resume.linkedin}</span>
+          <span
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => handleFieldChange("linkedin", e.currentTarget.textContent || "")}
+          >
+            {resume.linkedin}
+          </span>
         </div>
       </div>
 
       <h2>Experience</h2>
-      <ExperienceList experiences={resume.experience} onEdit={(exp) => { setEditingExp(exp); setIsModalOpen(true); }} />
+      <ExperienceList
+        experiences={resume.experience}
+        onEdit={(exp) => { setEditingExp(exp); setIsModalOpen(true); }}
+      />
       <button onClick={() => setIsModalOpen(true)}>+ Add Experience</button>
 
       <hr /> 
