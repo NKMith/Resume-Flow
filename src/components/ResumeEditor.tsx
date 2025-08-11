@@ -4,12 +4,24 @@ import { ExperienceList } from "./ExperienceList";
 import { ExperienceForm } from "./ExperienceForm";
 import { Modal } from "./Modal";
 
+function extractUsername(url: string) {
+  try {
+    const parsed = new URL(url.trim());
+    const paths = parsed.pathname.split("/").filter(Boolean);
+    return paths.length > 0 ? paths[paths.length - 1] : "";
+  } catch {
+    return "";
+  }
+}
+
 export const ResumeEditor: React.FC = () => {
   const [resume, setResume] = useState<Resume>({
     name: "Your Name",
-    contact: "email@example.com",
-    github: "https://github.com/you",
-    linkedin: "https://linkedin.com/in/you",
+    email: "email@example.com",
+    profiles: [
+      { network: "GitHub", username: "you", url: "https://github.com/you" },
+      { network: "LinkedIn", username: "you", url: "https://linkedin.com/in/you" }
+    ],
     experience: [],
     projects: []
   });
@@ -34,7 +46,6 @@ export const ResumeEditor: React.FC = () => {
   };
 
   const saveResume = () => {
-    // At this point, resume already has the latest state values
     console.log("Resume JSON:", resume);
     alert("Resume saved to console.");
   };
@@ -54,33 +65,27 @@ export const ResumeEditor: React.FC = () => {
           <span
             contentEditable
             suppressContentEditableWarning
-            onBlur={(e) => handleFieldChange("contact", e.currentTarget.textContent || "")}
+            onBlur={(e) => handleFieldChange("email", e.currentTarget.textContent || "")}
           >
-            {resume.contact}
+            {resume.email}
           </span>
         </div>
-        <div>
-          <label>GitHub: </label>
-          <span
-            contentEditable
-            suppressContentEditableWarning
-            onBlur={(e) => handleFieldChange("github", e.currentTarget.textContent || "")}
-          >
-            {resume.github}
-          </span>
-        </div>
-        <div>
-          <label>LinkedIn: </label>
-          <span
-            contentEditable
-            suppressContentEditableWarning
-            onBlur={(e) => handleFieldChange("linkedin", e.currentTarget.textContent || "")}
-          >
-            {resume.linkedin}
-          </span>
-        </div>
+        {resume.profiles.map((profile, i) => (
+          <div key={i}>
+            <label>{profile.network} URL:</label>
+            <input
+              type="text"
+              value={profile.url}
+              onChange={(e) => {
+                const newProfiles = [...resume.profiles];
+                newProfiles[i].url = e.target.value;
+                newProfiles[i].username = extractUsername(e.target.value);
+                setResume({ ...resume, profiles: newProfiles });
+              }}
+            />
+          </div>
+        ))}
       </div>
-
       <h2>Experience</h2>
       <ExperienceList
         experiences={resume.experience}
@@ -88,7 +93,7 @@ export const ResumeEditor: React.FC = () => {
       />
       <button onClick={() => setIsModalOpen(true)}>+ Add Experience</button>
 
-      <hr /> 
+      <hr />
       <button onClick={saveResume}>💾 Save Resume</button>
 
       <Modal

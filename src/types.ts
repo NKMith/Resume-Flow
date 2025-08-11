@@ -17,11 +17,16 @@ export interface Project {
   url?: string;
 }
 
+interface Profile {
+  network: string;
+  username: string;
+  url: string;
+}
+
 export interface Resume { // TODO - make this look like the JSONResume
   name: string;
-  contact: string;
-  github: string;
-  linkedin: string;
+  email: string;
+  profiles: Profile[]; // <-- no github/linkedin at top level
   experience: Experience[];
   projects: Project[];
 }
