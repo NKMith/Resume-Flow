@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { Resume, Experience } from "../types";
 import { ExperienceList } from "./ExperienceList";
 import { ExperienceForm } from "./ExperienceForm";
@@ -13,6 +13,8 @@ function extractUsername(url: string) {
     return "";
   }
 }
+
+const LOCAL_STORAGE_KEY = "my_resume_data";
 
 export const ResumeEditor: React.FC = () => {
   const [resume, setResume] = useState<Resume>({
@@ -29,11 +31,24 @@ export const ResumeEditor: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExp, setEditingExp] = useState<Experience | null>(null);
 
+  // Load saved resume from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed: Resume = JSON.parse(saved);
+        setResume(parsed);
+      } catch (e) {
+        console.error("Failed to parse saved resume from localStorage", e);
+      }
+    }
+  }, []);
+
   const handleSaveExperience = (exp: Experience) => {
     setResume((prev) => {
       const exists = prev.experience.some((e) => e.id === exp.id);
       const updatedExperience = exists
-        ? prev.experience.map((e) => e.id === exp.id ? exp : e)
+        ? prev.experience.map((e) => (e.id === exp.id ? exp : e))
         : [...prev.experience, exp];
       return { ...prev, experience: updatedExperience };
     });
@@ -45,9 +60,25 @@ export const ResumeEditor: React.FC = () => {
     setResume((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Function to trigger JSON file download
+  const downloadJsonFile = (data: object, filename: string) => {
+    const jsonStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const saveResume = () => {
-    console.log("Resume JSON:", resume);
-    alert("Resume saved to console.");
+    // Save to localStorage
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(resume));
+    // Trigger file download
+    downloadJsonFile(resume, "resume.json");
+
+    alert("Resume saved locally and downloaded as resume.json");
   };
 
   return (
@@ -89,7 +120,10 @@ export const ResumeEditor: React.FC = () => {
       <h2>Experience</h2>
       <ExperienceList
         experiences={resume.experience}
-        onEdit={(exp) => { setEditingExp(exp); setIsModalOpen(true); }}
+        onEdit={(exp) => {
+          setEditingExp(exp);
+          setIsModalOpen(true);
+        }}
       />
       <button onClick={() => setIsModalOpen(true)}>+ Add Experience</button>
 
@@ -99,7 +133,10 @@ export const ResumeEditor: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         title={editingExp ? "Edit Experience" : "Add Experience"}
-        onClose={() => { setIsModalOpen(false); setEditingExp(null); }}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingExp(null);
+        }}
       >
         <ExperienceForm initialData={editingExp || undefined} onSave={handleSaveExperience} />
       </Modal>
