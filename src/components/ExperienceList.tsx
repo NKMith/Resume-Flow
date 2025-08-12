@@ -15,7 +15,7 @@ export const ExperienceList: React.FC<Props> = ({ experiences, onEdit }) => {
           <p className="experience-startdate">{exp.startDate}</p>
           <p className="experience-enddate">{exp.endDate}</p>
           <ul className="experience-bullets">
-            {exp.highlights.map((b, i) => <li key={i}>{b}</li>)}
+            {(exp.highlights || []).map((b, i) => <li key={i}>{b}</li>)}
           </ul>
           <button onClick={() => onEdit(exp)}>Edit</button>
         </div>

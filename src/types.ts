@@ -15,6 +15,21 @@ export interface Project {
   highlights: string[];
 }
 
+export interface Education {
+  id: string;
+  institution: string;
+  url: string;
+  area: string;
+  studyType: string;
+  startDate?: string;
+  endDate?: string;
+  score: string;
+  courses: string[];
+}
+
+
+
+
 interface Profile {
   network: string;
   username: string;
@@ -27,4 +42,5 @@ export interface Resume { // TODO - make this look like the JSONResume
   profiles: Profile[]; // <-- no github/linkedin at top level
   experience: Experience[];
   projects: Project[];
+  education: Education[]; // <-- new
 }

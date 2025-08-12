@@ -6,6 +6,9 @@ import { Modal } from "./Modal";
 import  ProjectList  from "./ProjectList";
 import  ProjectForm  from "./ProjectForm";
 import type { Project } from "../types";
+import { EducationForm } from "./EducationForm";
+import { EducationList } from "./EducationList";
+import type { Education } from "../types";
 
 
 
@@ -32,7 +35,8 @@ export const ResumeEditor: React.FC = () => {
       { network: "LinkedIn", username: "you", url: "https://linkedin.com/in/you" }
     ],
     experience: [],
-    projects: []
+    projects: [],
+    education: []
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,6 +44,9 @@ export const ResumeEditor: React.FC = () => {
 
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+
+  const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
+  const [editingEducation, setEditingEducation] = useState<Education | null>(null);
 
   // Load saved resume from localStorage on mount
   useEffect(() => {
@@ -77,6 +84,18 @@ export const ResumeEditor: React.FC = () => {
     });
     setIsProjectModalOpen(false);
     setEditingProject(null);
+  };
+
+  const handleSaveEducation = (edu: Education) => {
+    setResume((prev) => {
+      const exists = prev.education?.some((e) => e.id === edu.id);
+      const updatedEducation = exists
+        ? prev.education.map((e) => (e.id === edu.id ? edu : e))
+        : [...(prev.education || []), edu];
+      return { ...prev, education: updatedEducation };
+    });
+    setIsEducationModalOpen(false);
+    setEditingEducation(null);
   };
 
   const handleFieldChange = (field: keyof Resume, value: string) => {
@@ -140,6 +159,15 @@ export const ResumeEditor: React.FC = () => {
           </div>
         ))}
       </div>
+      <h2>Education</h2>
+      <EducationList
+        education={resume.education || []}
+        onEdit={(edu) => {
+          setEditingEducation(edu);
+          setIsEducationModalOpen(true);
+        }}
+      />
+      <button onClick={() => setIsEducationModalOpen(true)}>+ Add Education</button>
       <h2>Experience</h2>
       <ExperienceList
         experiences={resume.experience}
@@ -186,6 +214,21 @@ export const ResumeEditor: React.FC = () => {
         }}
       >
         <ProjectForm initialData={editingProject || undefined} onSave={handleSaveProject} />
+      </Modal>
+
+      
+      <Modal
+        isOpen={isEducationModalOpen}
+        title={editingEducation ? "Edit Education" : "Add Education"}
+        onClose={() => {
+          setIsEducationModalOpen(false);
+          setEditingEducation(null);
+        }}
+      >
+        <EducationForm
+          initialData={editingEducation || undefined}
+          onSave={handleSaveEducation}
+        />
       </Modal>
     </div>
   );

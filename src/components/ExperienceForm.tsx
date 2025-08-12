@@ -62,9 +62,10 @@ const deleteBullet = (index: number) => {
       company,
       startDate,
       endDate,
-      highlights: bullets
+      highlights: bullets.length > 0 ? bullets : [],
     });
   };
+
 
   return (
     <div>
