@@ -4,17 +4,15 @@ export interface Experience {
   company: string;
   startDate?: string;
   endDate?: string;
-  bullets: string[];
+  highlights: string[];
 }
 
 export interface Project {
   id: string;
-  name: string;
+  title: string;
   startDate?: string;
   endDate?: string;
-  description: string;
   highlights: string[];
-  url?: string;
 }
 
 interface Profile {

@@ -3,6 +3,13 @@ import type { Resume, Experience } from "../types";
 import { ExperienceList } from "./ExperienceList";
 import { ExperienceForm } from "./ExperienceForm";
 import { Modal } from "./Modal";
+import  ProjectList  from "./ProjectList";
+import  ProjectForm  from "./ProjectForm";
+import type { Project } from "../types";
+
+
+
+
 
 function extractUsername(url: string) {
   try {
@@ -31,6 +38,9 @@ export const ResumeEditor: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExp, setEditingExp] = useState<Experience | null>(null);
 
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+
   // Load saved resume from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -56,6 +66,19 @@ export const ResumeEditor: React.FC = () => {
     setEditingExp(null);
   };
 
+  
+  const handleSaveProject = (proj: Project) => {
+    setResume((prev) => {
+      const exists = prev.projects.some((p) => p.id === proj.id);
+      const updatedProjects = exists
+        ? prev.projects.map((p) => (p.id === proj.id ? proj : p))
+        : [...prev.projects, proj];
+      return { ...prev, projects: updatedProjects };
+    });
+    setIsProjectModalOpen(false);
+    setEditingProject(null);
+  };
+
   const handleFieldChange = (field: keyof Resume, value: string) => {
     setResume((prev) => ({ ...prev, [field]: value }));
   };
@@ -76,7 +99,7 @@ export const ResumeEditor: React.FC = () => {
     // Save to localStorage
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(resume));
     // Trigger file download
-    downloadJsonFile(resume, "resume.json");
+    // downloadJsonFile(resume, "resume.json");
 
     alert("Resume saved locally and downloaded as resume.json");
   };
@@ -127,6 +150,19 @@ export const ResumeEditor: React.FC = () => {
       />
       <button onClick={() => setIsModalOpen(true)}>+ Add Experience</button>
 
+      <h2>Projects</h2>
+        <ProjectList
+          projects={resume.projects}
+          onEdit={(proj) => {
+            setEditingProject(proj);
+            setIsProjectModalOpen(true);
+          }}
+        />
+        <button onClick={() => setIsProjectModalOpen(true)}>+ Add Project</button>
+
+        
+
+
       <hr />
       <button onClick={saveResume}>💾 Save Resume</button>
 
@@ -139,6 +175,17 @@ export const ResumeEditor: React.FC = () => {
         }}
       >
         <ExperienceForm initialData={editingExp || undefined} onSave={handleSaveExperience} />
+      </Modal>
+
+      <Modal
+        isOpen={isProjectModalOpen}
+        title={editingProject ? "Edit Project" : "Add Project"}
+        onClose={() => {
+          setIsProjectModalOpen(false);
+          setEditingProject(null);
+        }}
+      >
+        <ProjectForm initialData={editingProject || undefined} onSave={handleSaveProject} />
       </Modal>
     </div>
   );

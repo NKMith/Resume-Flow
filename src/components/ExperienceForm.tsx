@@ -20,7 +20,7 @@ export const ExperienceForm: React.FC<Props> = ({ initialData, onSave }) => {
       setCompany(initialData.company);
       setStartDate(initialData.startDate || "");
       setEndDate(initialData.endDate || "");
-      setBullets(initialData.bullets);
+      setBullets(initialData.highlights);
     }
   }, [initialData]);
 
@@ -62,7 +62,7 @@ const deleteBullet = (index: number) => {
       company,
       startDate,
       endDate,
-      bullets
+      highlights: bullets
     });
   };
 
