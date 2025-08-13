@@ -69,32 +69,40 @@ export const EducationForm: React.FC<Props> = ({ initialData, onSave }) => {
       <label>Study Type</label>
       <input value={studyType} onChange={(e) => setStudyType(e.target.value)} />
 
-      <label>Start Date</label>
-      <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-
-      <label>End Date</label>
-      <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+      <div className="date-fields">
+        <div className="date-field-group">
+          <label>Start Date</label>
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+        </div>
+        <div className="date-field-group">
+          <label>End Date</label>
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+        </div>
+      </div>
 
       <label>Score</label>
       <input value={score} onChange={(e) => setScore(e.target.value)} />
 
       <label>Courses</label>
-      <div>
+      <div className="bullets-container">
         {courses.map((course, i) => (
-          <div key={i} className="course-item">
+          <div key={i} className="bullet-wrapper">
             <input
               value={course}
               onChange={(e) => updateCourse(i, e.target.value)}
+              className="bullet-point-input"
             />
-            <button type="button" onClick={() => deleteCourse(i)}>🗑️</button>
+            <button type="button" className="delete-bullet-btn" onClick={() => deleteCourse(i)}>🗑️</button>
           </div>
         ))}
-        <button type="button" onClick={addCourse}>+ Add Course</button>
+        <button type="button" className="button button-secondary add-button" onClick={addCourse}>+ Add Course</button>
       </div>
 
-      <button type="button" onClick={handleSubmit}>
-        {initialData ? "Update Education" : "Add Education"}
-      </button>
+      <div className="button-group">
+        <button type="button" className="button button-primary" onClick={handleSubmit}>
+          {initialData ? "Update Education" : "Add Education"}
+        </button>
+      </div>
     </div>
   );
 };

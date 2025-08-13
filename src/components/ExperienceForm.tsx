@@ -31,19 +31,18 @@ export const ExperienceForm: React.FC<Props> = ({ initialData, onSave }) => {
     setBullets(updated);
   };
 
-const deleteBullet = (index: number) => {
-  const updated = [...bullets];
-  updated.splice(index, 1);
-  setBullets(updated);
-};
-
+  const deleteBullet = (index: number) => {
+    const updated = [...bullets];
+    updated.splice(index, 1);
+    setBullets(updated);
+  };
 
   const handleDragStart = (index: number) => {
     setDragIndex(index);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault(); // Needed so drop will fire
+    e.preventDefault();
   };
 
   const handleDrop = (index: number) => {
@@ -66,7 +65,6 @@ const deleteBullet = (index: number) => {
     });
   };
 
-
   return (
     <div>
       <label>Title</label>
@@ -76,43 +74,46 @@ const deleteBullet = (index: number) => {
       <input value={company} onChange={(e) => setCompany(e.target.value)} />
 
       <div className="date-fields">
-        <label>Start Date</label>
-        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-
-        <label>End Date</label>
-        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+        <div className="date-field-group">
+          <label>Start Date</label>
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+        </div>
+        <div className="date-field-group">
+          <label>End Date</label>
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+        </div>
       </div>
 
       <label>Bullet Points</label>
       <div className="bullets-container">
         {bullets.map((bullet, i) => (
-        <div key={i} className="bullet-wrapper">
-          <input
-            draggable
-            onDragStart={() => handleDragStart(i)}
-            onDragOver={handleDragOver}
-            onDrop={() => handleDrop(i)}
-            value={bullet}
-            onChange={(e) => updateBullet(i, e.target.value)}
-            className="bullet-point-input"
-          />
-          <button
-            type="button"
-            // className="delete-bullet-btn"
-            className="delete-bullet-btn"
-            onClick={() => deleteBullet(i)}
-          >
-            🗑️
-          </button>
-        </div>
-      ))}
-
+          <div key={i} className="bullet-wrapper">
+            <input
+              draggable
+              onDragStart={() => handleDragStart(i)}
+              onDragOver={handleDragOver}
+              onDrop={() => handleDrop(i)}
+              value={bullet}
+              onChange={(e) => updateBullet(i, e.target.value)}
+              className="bullet-point-input"
+            />
+            <button
+              type="button"
+              className="delete-bullet-btn"
+              onClick={() => deleteBullet(i)}
+            >
+              🗑️
+            </button>
+          </div>
+        ))}
+        <button type="button" className="button button-secondary add-button" onClick={addBullet}>+ Add Bullet Point</button>
       </div>
-      <button type="button" onClick={addBullet}>+ Add Bullet Point</button>
 
-      <button type="button" onClick={handleSubmit}>
-        {initialData ? "Update Experience" : "Add Experience"}
-      </button>
+      <div className="button-group">
+        <button type="button" className="button button-primary" onClick={handleSubmit}>
+          {initialData ? "Update Experience" : "Add Experience"}
+        </button>
+      </div>
     </div>
   );
 };

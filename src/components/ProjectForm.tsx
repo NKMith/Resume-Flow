@@ -8,7 +8,6 @@ interface ProjectFormProps {
 
 export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
   const [title, setTitle] = useState("");
-  //const [company, setCompany] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [bullets, setBullets] = useState<string[]>([]);
@@ -17,7 +16,6 @@ export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title);
-      // setCompany(initialData.company);
       setStartDate(initialData.startDate || "");
       setEndDate(initialData.endDate || "");
       setBullets(initialData.highlights);
@@ -30,61 +28,60 @@ export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
     updated[index] = value;
     setBullets(updated);
   };
-  
+    
   const deleteBullet = (index: number) => {
     const updated = [...bullets];
     updated.splice(index, 1);
     setBullets(updated);
   };
-  
-  
-    const handleDragStart = (index: number) => {
-      setDragIndex(index);
-    };
-  
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault(); // Needed so drop will fire
-    };
-  
-    const handleDrop = (index: number) => {
-      if (dragIndex === null) return;
-      const updated = [...bullets];
-      const [removed] = updated.splice(dragIndex, 1);
-      updated.splice(index, 0, removed);
-      setBullets(updated);
-      setDragIndex(null);
-    };
-  
-    const handleSubmit = () => {
-      onSave({
-        id: initialData?.id || Date.now().toString(),
-        title,
-        // company,
-        startDate,
-        endDate,
-        highlights: bullets
-      });
-    };
-  
-    return (
-      <div>
-        <label>Title</label>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} />
-  
-        {/* <label>Company</label>
-        <input value={company} onChange={(e) => setCompany(e.target.value)} /> */}
-  
-        <div className="date-fields">
+    
+    
+  const handleDragStart = (index: number) => {
+    setDragIndex(index);
+  };
+    
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+    
+  const handleDrop = (index: number) => {
+    if (dragIndex === null) return;
+    const updated = [...bullets];
+    const [removed] = updated.splice(dragIndex, 1);
+    updated.splice(index, 0, removed);
+    setBullets(updated);
+    setDragIndex(null);
+  };
+    
+  const handleSubmit = () => {
+    onSave({
+      id: initialData?.id || Date.now().toString(),
+      title,
+      startDate,
+      endDate,
+      highlights: bullets
+    });
+  };
+    
+  return (
+    <div>
+      <label>Title</label>
+      <input value={title} onChange={(e) => setTitle(e.target.value)} />
+    
+      <div className="date-fields">
+        <div className="date-field-group">
           <label>Start Date</label>
           <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-  
+        </div>
+        <div className="date-field-group">
           <label>End Date</label>
           <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </div>
-  
-        <label>Bullet Points</label>
-        <div className="bullets-container">
-          {bullets.map((bullet, i) => (
+      </div>
+    
+      <label>Bullet Points</label>
+      <div className="bullets-container">
+        {bullets.map((bullet, i) => (
           <div key={i} className="bullet-wrapper">
             <input
               draggable
@@ -97,7 +94,6 @@ export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
             />
             <button
               type="button"
-              // className="delete-bullet-btn"
               className="delete-bullet-btn"
               onClick={() => deleteBullet(i)}
             >
@@ -105,13 +101,15 @@ export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
             </button>
           </div>
         ))}
-  
-        </div>
-        <button type="button" onClick={addBullet}>+ Add Bullet Point</button>
-  
-        <button type="button" onClick={handleSubmit}>
+    
+      </div>
+      <button type="button" className="button button-secondary add-button" onClick={addBullet}>+ Add Bullet Point</button>
+    
+      <div className="button-group">
+        <button type="button" className="button button-primary" onClick={handleSubmit}>
           {initialData ? "Update Project" : "Add Project"}
         </button>
       </div>
-    );
+    </div>
+  );
 }

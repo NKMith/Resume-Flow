@@ -3,8 +3,8 @@ import type { Resume, Experience } from "../types";
 import { ExperienceList } from "./ExperienceList";
 import { ExperienceForm } from "./ExperienceForm";
 import { Modal } from "./Modal";
-import  ProjectList  from "./ProjectList";
-import  ProjectForm  from "./ProjectForm";
+import ProjectList from "./ProjectList";
+import ProjectForm from "./ProjectForm";
 import type { Project } from "../types";
 import { EducationForm } from "./EducationForm";
 import { EducationList } from "./EducationList";
@@ -68,25 +68,34 @@ export const ResumeEditor: React.FC = () => {
     setResume((prev) => {
       const exists = prev.experience.some((e) => e.id === exp.id);
       const updatedExperience = exists
-        ? prev.experience.map((e) => (e.id === exp.id ? exp : e))
+        ? prev.experience.map((e) => (e.id === exp.id ? e : e))
         : [...prev.experience, exp];
       return { ...prev, experience: updatedExperience };
     });
     setIsExperienceModalOpen(false);
     setEditingExp(null);
   };
-
   
+  const handleEditExperience = (exp: Experience) => {
+    setEditingExp(exp);
+    setIsExperienceModalOpen(true);
+  };
+
   const handleSaveProject = (proj: Project) => {
     setResume((prev) => {
       const exists = prev.projects.some((p) => p.id === proj.id);
       const updatedProjects = exists
-        ? prev.projects.map((p) => (p.id === proj.id ? proj : p))
+        ? prev.projects.map((p) => (p.id === proj.id ? p : p))
         : [...prev.projects, proj];
       return { ...prev, projects: updatedProjects };
     });
     setIsProjectModalOpen(false);
     setEditingProject(null);
+  };
+
+  const handleEditProject = (proj: Project) => {
+    setEditingProject(proj);
+    setIsProjectModalOpen(true);
   };
 
   const handleSaveEducation = (edu: Education) => {
@@ -101,7 +110,11 @@ export const ResumeEditor: React.FC = () => {
     setEditingEducation(null);
   };
 
-  // Function to show the bullet point modal
+  const handleEditEducation = (edu: Education) => {
+    setEditingEducation(edu);
+    setIsEducationModalOpen(true);
+  };
+
   const handleShowBullets = (bullets: string[], title: string) => {
     setCurrentBullets(bullets);
     setBulletModalTitle(title);
@@ -112,7 +125,18 @@ export const ResumeEditor: React.FC = () => {
     setResume((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Function to delete an experience by its ID
+  const handleProfileChange = (index: number, newUrl: string) => {
+    setResume((prev) => {
+      const updatedProfiles = [...prev.profiles];
+      updatedProfiles[index] = {
+        ...updatedProfiles[index],
+        url: newUrl,
+        username: extractUsername(newUrl),
+      };
+      return { ...prev, profiles: updatedProfiles };
+    });
+  };
+
   const handleDeleteExperience = (id: string) => {
     setResume((prev) => ({
       ...prev,
@@ -120,7 +144,6 @@ export const ResumeEditor: React.FC = () => {
     }));
   };
 
-  // Function to delete a project by its ID
   const handleDeleteProject = (id: string) => {
     setResume((prev) => ({
       ...prev,
@@ -128,7 +151,14 @@ export const ResumeEditor: React.FC = () => {
     }));
   };
 
-  // Function to trigger JSON file download
+  const handleDeleteEducation = (id: string) => {
+    setResume((prev) => ({
+      ...prev,
+      education: prev.education?.filter((edu) => edu.id !== id) || [],
+    }));
+  };
+
+
   const downloadJsonFile = (data: object, filename: string) => {
     const jsonStr = JSON.stringify(data, null, 2);
     const blob = new Blob([jsonStr], { type: "application/json" });
@@ -141,116 +171,111 @@ export const ResumeEditor: React.FC = () => {
   };
 
   const saveResume = () => {
-    // Save to localStorage
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(resume));
-    // Trigger file download
-    // downloadJsonFile(resume, "resume.json");
-
+    downloadJsonFile(resume, "resume.json");
     alert("Resume saved locally and downloaded as resume.json");
   };
 
   return (
     <div className="container">
-      <div>
-        <h1
+      <h1
+        className="editable-text"
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={(e) => handleFieldChange("name", e.currentTarget.textContent || "")}
+      >
+        {resume.name}
+      </h1>
+      <div className="contact-info">
+        <label>Email:</label>
+        <span
+          className="editable-text"
           contentEditable
           suppressContentEditableWarning
-          onBlur={(e) => handleFieldChange("name", e.currentTarget.textContent || "")}
+          onBlur={(e) => handleFieldChange("email", e.currentTarget.textContent || "")}
         >
-          {resume.name}
-        </h1>
-        <div>
-          <label>Contact: </label>
-          <span
-            contentEditable
-            suppressContentEditableWarning
-            onBlur={(e) => handleFieldChange("email", e.currentTarget.textContent || "")}
-          >
-            {resume.email}
-          </span>
-        </div>
-        {resume.profiles.map((profile, i) => (
-          <div key={i}>
-            <label>{profile.network} URL:</label>
-            <input
-              type="text"
-              value={profile.url}
-              onChange={(e) => {
-                const newProfiles = [...resume.profiles];
-                newProfiles[i].url = e.target.value;
-                newProfiles[i].username = extractUsername(e.target.value);
-                setResume({ ...resume, profiles: newProfiles });
-              }}
-            />
-          </div>
-        ))}
+          {resume.email}
+        </span>
       </div>
-      <h2>Education</h2>
+      {resume.profiles.map((profile, i) => (
+        <div key={i} className="profile-input-group">
+          <label>{profile.network} URL:</label>
+          <input
+            type="text"
+            value={profile.url}
+            onChange={(e) => handleProfileChange(i, e.target.value)}
+          />
+        </div>
+      ))}
+      <hr />
+
+      <h2 className="section-title">Education</h2>
       <EducationList
         education={resume.education || []}
-        onEdit={(edu) => {
-          setEditingEducation(edu);
-          setIsEducationModalOpen(true);
-        }}
+        onEdit={handleEditEducation}
+        onDelete={handleDeleteEducation}
       />
-      <button onClick={() => setIsEducationModalOpen(true)}>+ Add Education</button>
-      <h2>Experience</h2>
+      <button className="button button-primary add-button" onClick={() => { setIsEducationModalOpen(true); setEditingEducation(null); }}>
+        + Add Education
+      </button>
+
+      <hr />
+
+      <h2 className="section-title">Experience</h2>
       <ExperienceList
         experiences={resume.experience}
-        onEdit={(exp) => {
-          setEditingExp(exp);
-          setIsExperienceModalOpen(true);
-        }}
-        onDelete={handleDeleteExperience} 
-        onShowBullets={handleShowBullets} // Pass the new handler
+        onEdit={handleEditExperience}
+        onDelete={handleDeleteExperience}
+        onShowBullets={handleShowBullets}
       />
-      <button onClick={() => setIsExperienceModalOpen(true)}>+ Add Experience</button>
+      <button className="button button-primary add-button" onClick={() => { setIsExperienceModalOpen(true); setEditingExp(null); }}>
+        + Add Experience
+      </button>
 
-      <h2>Projects</h2>
+      <hr />
+
+      <h2 className="section-title">Projects</h2>
       <ProjectList
         projects={resume.projects}
-        onEdit={(proj) => {
-          setEditingProject(proj);
-          setIsProjectModalOpen(true);
-        }}
-        // Pass the delete function as a prop
+        onEdit={handleEditProject}
         onDelete={handleDeleteProject}
-        onShowBullets={handleShowBullets} // Pass the new handler
+        onShowBullets={handleShowBullets}
       />
-      <button onClick={() => setIsProjectModalOpen(true)}>+ Add Project</button>
+      <button className="button button-primary add-button" onClick={() => { setIsProjectModalOpen(true); setEditingProject(null); }}>
+        + Add Project
+      </button>
+      
       <hr />
-      <button onClick={saveResume}>💾 Save Resume</button>
+      <button className="button button-primary" onClick={saveResume}>
+        💾 Save Resume
+      </button>
 
       <Modal
         isOpen={isExperienceModalOpen}
         title={editingExp ? "Edit Experience" : "Add Experience"}
-        onClose={() => {
-          setIsExperienceModalOpen(false);
-          setEditingExp(null);
-        }}
+        onClose={() => setIsExperienceModalOpen(false)}
       >
-        <ExperienceForm initialData={editingExp || undefined} onSave={handleSaveExperience} />
+        <ExperienceForm
+          initialData={editingExp || undefined}
+          onSave={handleSaveExperience}
+        />
       </Modal>
 
       <Modal
         isOpen={isProjectModalOpen}
         title={editingProject ? "Edit Project" : "Add Project"}
-        onClose={() => {
-          setIsProjectModalOpen(false);
-          setEditingProject(null);
-        }}
+        onClose={() => setIsProjectModalOpen(false)}
       >
-        <ProjectForm initialData={editingProject || undefined} onSave={handleSaveProject} />
+        <ProjectForm
+          initialData={editingProject || undefined}
+          onSave={handleSaveProject}
+        />
       </Modal>
 
-      
       <Modal
         isOpen={isEducationModalOpen}
         title={editingEducation ? "Edit Education" : "Add Education"}
-        onClose={() => {
-          setIsEducationModalOpen(false);
-          setEditingEducation(null);
-        }}
+        onClose={() => setIsEducationModalOpen(false)}
       >
         <EducationForm
           initialData={editingEducation || undefined}
@@ -258,16 +283,13 @@ export const ResumeEditor: React.FC = () => {
         />
       </Modal>
 
-      <BulletPointModal
+      <Modal
         isOpen={isBulletPointModalOpen}
-        onClose={() => {
-          setIsBulletPointModalOpen(false);
-          setCurrentBullets([]);
-          setBulletModalTitle("");
-        }}
         title={bulletModalTitle}
-        bullets={currentBullets}
-      />
+        onClose={() => setIsBulletPointModalOpen(false)}
+      >
+        <BulletPointModal bullets={currentBullets} />
+      </Modal>
     </div>
   );
 };
