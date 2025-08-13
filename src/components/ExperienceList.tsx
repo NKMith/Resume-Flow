@@ -4,9 +4,11 @@ import type { Experience } from "../types";
 interface Props {
   experiences: Experience[];
   onEdit: (exp: Experience) => void;
+  // Add onDelete prop
+  onDelete: (id: string) => void;
 }
 
-export const ExperienceList: React.FC<Props> = ({ experiences, onEdit }) => {
+export const ExperienceList: React.FC<Props> = ({ experiences, onEdit, onDelete }) => {
   return (
     <div>
       {experiences.map((exp) => (
@@ -18,6 +20,7 @@ export const ExperienceList: React.FC<Props> = ({ experiences, onEdit }) => {
             {(exp.highlights || []).map((b, i) => <li key={i}>{b}</li>)}
           </ul>
           <button onClick={() => onEdit(exp)}>Edit</button>
+          <button onClick={() => onDelete(exp.id)}>Delete</button>
         </div>
       ))}
     </div>

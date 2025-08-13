@@ -12,8 +12,6 @@ import type { Education } from "../types";
 
 
 
-
-
 function extractUsername(url: string) {
   try {
     const parsed = new URL(url.trim());
@@ -102,6 +100,22 @@ export const ResumeEditor: React.FC = () => {
     setResume((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Function to delete an experience by its ID
+  const handleDeleteExperience = (id: string) => {
+    setResume((prev) => ({
+      ...prev,
+      experience: prev.experience.filter((exp) => exp.id !== id),
+    }));
+  };
+
+  // Function to delete a project by its ID
+  const handleDeleteProject = (id: string) => {
+    setResume((prev) => ({
+      ...prev,
+      projects: prev.projects.filter((proj) => proj.id !== id),
+    }));
+  };
+
   // Function to trigger JSON file download
   const downloadJsonFile = (data: object, filename: string) => {
     const jsonStr = JSON.stringify(data, null, 2);
@@ -175,6 +189,7 @@ export const ResumeEditor: React.FC = () => {
           setEditingExp(exp);
           setIsExperienceModalOpen(true);
         }}
+        onDelete={handleDeleteExperience} 
       />
       <button onClick={() => setIsExperienceModalOpen(true)}>+ Add Experience</button>
 
@@ -185,6 +200,8 @@ export const ResumeEditor: React.FC = () => {
           setEditingProject(proj);
           setIsProjectModalOpen(true);
         }}
+        // Pass the delete function as a prop
+        onDelete={handleDeleteProject}
       />
       <button onClick={() => setIsProjectModalOpen(true)}>+ Add Project</button>
       <hr />
