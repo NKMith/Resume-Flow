@@ -1,28 +1,30 @@
 import React, { useState, useEffect } from "react";
-import type { Project } from '../types';
+import type { Work } from "../types";
 
-interface ProjectFormProps {
-  onSave: (project: Project) => void;
-  initialData?: Project;
+interface Props {
+  initialData?: Work;
+  onSave: (exp: Work) => void;
 }
 
-export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
-  const [name, setName] = useState("");
+export const WorkForm: React.FC<Props> = ({ initialData, onSave }) => {
+  const [position, setPosition] = useState("");
+  const [company, setCompany] = useState("");
   const [url, setUrl] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [description, setDescription] = useState("");
+  const [summary, setSummary] = useState("");
   const [highlights, setHighlights] = useState<string[]>([]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (initialData) {
-      setName(initialData.name);
+      setPosition(initialData.position);
+      setCompany(initialData.name);
       setUrl(initialData.url);
       setStartDate(initialData.startDate || "");
       setEndDate(initialData.endDate || "");
-      setDescription(initialData.description);
-      setHighlights(initialData.highlights);
+      setSummary(initialData.summary);
+      setHighlights(initialData.highlights || []);
     }
   }, [initialData]);
 
@@ -32,21 +34,21 @@ export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
     updated[index] = value;
     setHighlights(updated);
   };
-    
+
   const deleteBullet = (index: number) => {
     const updated = [...highlights];
     updated.splice(index, 1);
     setHighlights(updated);
   };
-    
+
   const handleDragStart = (index: number) => {
     setDragIndex(index);
   };
-    
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
-    
+
   const handleDrop = (index: number) => {
     if (dragIndex === null) return;
     const updated = [...highlights];
@@ -55,30 +57,35 @@ export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
     setHighlights(updated);
     setDragIndex(null);
   };
-    
+
   const handleSubmit = () => {
     onSave({
       id: initialData?.id || Date.now().toString(),
-      name,
+      name: company,
+      position,
       url,
       startDate,
       endDate,
-      description,
-      highlights
+      summary,
+      highlights: highlights.length > 0 ? highlights : [],
     });
   };
-    
+
   return (
     <div>
       <div className="form-field-group">
-        <label>Project Name</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Project" />
+        <label>Company</label>
+        <input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company" />
       </div>
       <div className="form-field-group">
-        <label>Project URL</label>
-        <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://project.com" />
+        <label>Position</label>
+        <input value={position} onChange={(e) => setPosition(e.target.value)} placeholder="President" />
       </div>
-    
+      <div className="form-field-group">
+        <label>URL</label>
+        <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://company.com" />
+      </div>
+
       <div className="date-fields form-field-group">
         <div className="date-field-group">
           <label>Start Date</label>
@@ -89,12 +96,12 @@ export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
           <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </div>
       </div>
-    
+      
       <div className="form-field-group">
-        <label>Description</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description…" />
+        <label>Summary</label>
+        <textarea value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="Description…" />
       </div>
-    
+
       <div className="form-field-group">
         <label>Highlights</label>
         <div className="bullets-container">
@@ -108,7 +115,7 @@ export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
                 value={bullet}
                 onChange={(e) => updateBullet(i, e.target.value)}
                 className="bullet-point-input"
-                placeholder="e.g. Won award at AIHacks 2016"
+                placeholder="e.g. Started the company"
               />
               <button
                 type="button"
@@ -122,12 +129,12 @@ export default function ProjectForm({ onSave, initialData }: ProjectFormProps) {
           <button type="button" className="button button-secondary add-button" onClick={addBullet}>+ Add Highlight</button>
         </div>
       </div>
-    
+
       <div className="button-group">
         <button type="button" className="button button-primary" onClick={handleSubmit}>
-          {initialData ? "Update Project" : "Add Project"}
+          {initialData ? "Update Work" : "Add Work"}
         </button>
       </div>
     </div>
   );
-}
+};

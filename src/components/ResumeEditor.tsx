@@ -1,15 +1,17 @@
+// ResumeEditor.tsx
+
 import React, { useState, useEffect } from "react";
-import type { Resume, Experience } from "../types";
-import { ExperienceList } from "./ExperienceList";
-import { ExperienceForm } from "./ExperienceForm";
+import type { Resume, Work, Education, Project, Skill } from "../types";
+import { WorkList } from "./WorkList";
+import { WorkForm } from "./WorkForm";
 import { Modal } from "./Modal";
 import ProjectList from "./ProjectList";
 import ProjectForm from "./ProjectForm";
-import type { Project } from "../types";
 import { EducationForm } from "./EducationForm";
 import { EducationList } from "./EducationList";
-import type { Education } from "../types";
 import { BulletPointModal } from "./BulletPointModal";
+import { SkillForm } from "./SkillForm";
+import { SkillList } from "./SkillList";
 
 function extractUsername(url: string) {
   try {
@@ -25,35 +27,59 @@ const LOCAL_STORAGE_KEY = "my_resume_data";
 
 export const ResumeEditor: React.FC = () => {
   const [resume, setResume] = useState<Resume>({
-    // Updated to use the new `basics` object
     basics: {
-      name: "Your Name",
-      email: "email@example.com",
-      profiles: [
-        { network: "GitHub", username: "you", url: "https://github.com/you" },
-        { network: "LinkedIn", username: "you", url: "https://linkedin.com/in/you" }
-      ],
+      name: "John Doe",
+      label: "Programmer",
+      image: "",
+      email: "john@gmail.com",
+      phone: "(912) 555-4321",
+      url: "https://johndoe.com",
+      summary: "A summary of John Doe…",
+      location: {
+        address: "2712 Broadway St",
+        postalCode: "CA 94115",
+        city: "San Francisco",
+        countryCode: "US",
+        region: "California",
+      },
+      profiles: [{
+        network: "Twitter",
+        username: "john",
+        url: "https://twitter.com/john",
+      }],
     },
-    experience: [],
+    work: [],
+    volunteer: [],
+    education: [],
+    awards: [],
+    certificates: [],
+    publications: [],
+    skills: [], // Initial empty array for skills
+    languages: [],
+    interests: [],
+    references: [],
     projects: [],
-    education: []
   });
 
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
-  const [editingExp, setEditingExp] = useState<Experience | null>(null);
+  const [editingExp, setEditingExp] = useState<Work | null>(null);
 
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState<Education | null>(null);
+  
+  const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
+  const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
 
-  const [isBulletPointModalOpen, setIsBulletPointModalOpen] = useState(false);
+  const [isBulletPointModalOpen, setIsBulletPointModal] = useState(false);
   const [currentBullets, setCurrentBullets] = useState<string[]>([]);
   const [bulletModalTitle, setBulletModalTitle] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    // const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const saved = null;
     if (saved) {
       try {
         const parsed: Resume = JSON.parse(saved);
@@ -64,23 +90,32 @@ export const ResumeEditor: React.FC = () => {
     }
   }, []);
 
-  const handleSaveExperience = (exp: Experience) => {
+  // --- Functions for Work Experience ---
+  const handleSaveExperience = (exp: Work) => {
     setResume((prev) => {
-      const exists = prev.experience.some((e) => e.id === exp.id);
-      const updatedExperience = exists
-        ? prev.experience.map((e) => (e.id === exp.id ? exp : e))
-        : [...prev.experience, exp];
-      return { ...prev, experience: updatedExperience };
+      const exists = prev.work.some((e) => e.id === exp.id);
+      const updatedWork = exists
+        ? prev.work.map((e) => (e.id === exp.id ? exp : e))
+        : [...prev.work, exp];
+      return { ...prev, work: updatedWork };
     });
     setIsExperienceModalOpen(false);
     setEditingExp(null);
   };
-  
-  const handleEditExperience = (exp: Experience) => {
+
+  const handleEditExperience = (exp: Work) => {
     setEditingExp(exp);
     setIsExperienceModalOpen(true);
   };
 
+  const handleDeleteExperience = (id: string) => {
+    setResume((prev) => ({
+      ...prev,
+      work: prev.work.filter((exp) => exp.id !== id),
+    }));
+  };
+
+  // --- Functions for Projects ---
   const handleSaveProject = (proj: Project) => {
     setResume((prev) => {
       const exists = prev.projects.some((p) => p.id === proj.id);
@@ -98,6 +133,14 @@ export const ResumeEditor: React.FC = () => {
     setIsProjectModalOpen(true);
   };
 
+  const handleDeleteProject = (id: string) => {
+    setResume((prev) => ({
+      ...prev,
+      projects: prev.projects.filter((proj) => proj.id !== id),
+    }));
+  };
+
+  // --- Functions for Education ---
   const handleSaveEducation = (edu: Education) => {
     setResume((prev) => {
       const exists = prev.education?.some((e) => e.id === edu.id);
@@ -115,56 +158,6 @@ export const ResumeEditor: React.FC = () => {
     setIsEducationModalOpen(true);
   };
 
-  const handleShowBullets = (bullets: string[], title: string) => {
-    setCurrentBullets(bullets);
-    setBulletModalTitle(title);
-    setIsBulletPointModalOpen(true);
-  };
-
-  // New function to handle changes to the `basics` object
-  const handleBasicsChange = (field: keyof typeof resume.basics, value: string) => {
-    setResume((prev) => ({
-      ...prev,
-      basics: {
-        ...prev.basics,
-        [field]: value
-      }
-    }));
-  };
-
-  // Updated function to handle changes to `profiles`
-  const handleProfileChange = (index: number, newUrl: string) => {
-    setResume((prev) => {
-      const updatedProfiles = [...prev.basics.profiles];
-      updatedProfiles[index] = {
-        ...updatedProfiles[index],
-        url: newUrl,
-        username: extractUsername(newUrl),
-      };
-      return {
-        ...prev,
-        basics: {
-          ...prev.basics,
-          profiles: updatedProfiles
-        }
-      };
-    });
-  };
-
-  const handleDeleteExperience = (id: string) => {
-    setResume((prev) => ({
-      ...prev,
-      experience: prev.experience.filter((exp) => exp.id !== id),
-    }));
-  };
-
-  const handleDeleteProject = (id: string) => {
-    setResume((prev) => ({
-      ...prev,
-      projects: prev.projects.filter((proj) => proj.id !== id),
-    }));
-  };
-
   const handleDeleteEducation = (id: string) => {
     setResume((prev) => ({
       ...prev,
@@ -172,6 +165,99 @@ export const ResumeEditor: React.FC = () => {
     }));
   };
 
+  // --- Functions for Skills ---
+  const handleSaveSkill = (skill: Skill) => {
+    setResume((prev) => {
+      const exists = prev.skills.some((s) => s.id === skill.id);
+      const updatedSkills = exists
+        ? prev.skills.map((s) => (s.id === skill.id ? skill : s))
+        : [...prev.skills, skill];
+      return { ...prev, skills: updatedSkills };
+    });
+    setIsSkillModalOpen(false);
+    setEditingSkill(null);
+  };
+
+  const handleEditSkill = (skill: Skill) => {
+    setEditingSkill(skill);
+    setIsSkillModalOpen(true);
+  };
+
+  const handleDeleteSkill = (id: string) => {
+    setResume((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((skill) => skill.id !== id),
+    }));
+  };
+
+  // --- Global Functions ---
+  const handleShowBullets = (bullets: string[], title: string) => {
+    setCurrentBullets(bullets);
+    setBulletModalTitle(title);
+    setIsBulletPointModal(true);
+  };
+
+  const handleBasicsChange = (field: keyof typeof resume.basics, value: string) => {
+    setResume((prev) => ({
+      ...prev,
+      basics: {
+        ...prev.basics,
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleLocationChange = (field: keyof typeof resume.basics.location, value: string) => {
+    setResume((prev) => ({
+      ...prev,
+      basics: {
+        ...prev.basics,
+        location: {
+          ...prev.basics.location,
+          [field]: value,
+        },
+      },
+    }));
+  };
+
+  const handleProfileChange = (index: number, newUrl: string, network: string) => {
+    setResume((prev) => {
+      const updatedProfiles = [...prev.basics.profiles];
+      updatedProfiles[index] = {
+        ...updatedProfiles[index],
+        url: newUrl,
+        username: extractUsername(newUrl),
+        network: network,
+      };
+      return {
+        ...prev,
+        basics: {
+          ...prev.basics,
+          profiles: updatedProfiles,
+        },
+      };
+    });
+  };
+
+  const handleAddProfile = () => {
+    setResume((prev) => ({
+      ...prev,
+      basics: {
+        ...prev.basics,
+        profiles: [...prev.basics.profiles, { network: "", username: "", url: "" }],
+      },
+    }));
+  };
+
+  const handleDeleteProfile = (index: number) => {
+    setResume((prev) => ({
+      ...prev,
+      basics: {
+        ...prev.basics,
+        profiles: prev.basics.profiles.filter((_, i) => i !== index),
+      },
+    }));
+  };
 
   const downloadJsonFile = (data: object, filename: string) => {
     const jsonStr = JSON.stringify(data, null, 2);
@@ -195,6 +281,8 @@ export const ResumeEditor: React.FC = () => {
 
   return (
     <div className="container">
+      <h2 className="section-title">Basics</h2>
+      <label>Name</label>
       <h1
         className="editable-text"
         contentEditable
@@ -203,27 +291,129 @@ export const ResumeEditor: React.FC = () => {
       >
         {resume.basics.name}
       </h1>
-      <div className="contact-info">
-        <label>Email:</label>
-        <span
-          className="editable-text"
-          contentEditable
-          suppressContentEditableWarning
-          onBlur={(e) => handleBasicsChange("email", e.currentTarget.textContent || "")}
-        >
-          {resume.basics.email}
-        </span>
+
+      <div className="form-field-group">
+        <label>Label</label>
+        <input
+          placeholder="e.g. Programmer"
+          value={resume.basics.label}
+          onChange={(e) => handleBasicsChange("label", e.target.value)}
+        />
       </div>
+
+      <div className="form-field-group">
+        <label>Summary</label>
+        <textarea
+          placeholder="A summary of John Doe…"
+          value={resume.basics.summary}
+          onChange={(e) => handleBasicsChange("summary", e.target.value)}
+        />
+      </div>
+
+      <hr />
+
+      <h2 className="section-title">Contact Information</h2>
+      <div className="form-field-group">
+        <label>Email</label>
+        <input
+          placeholder="john@gmail.com"
+          value={resume.basics.email}
+          onChange={(e) => handleBasicsChange("email", e.target.value)}
+        />
+      </div>
+      <div className="form-field-group">
+        <label>Phone</label>
+        <input
+          placeholder="(912) 555-4321"
+          value={resume.basics.phone}
+          onChange={(e) => handleBasicsChange("phone", e.target.value)}
+        />
+      </div>
+      <div className="form-field-group">
+        <label>Website URL</label>
+        <input
+          placeholder="https://johndoe.com"
+          value={resume.basics.url}
+          onChange={(e) => handleBasicsChange("url", e.target.value)}
+        />
+      </div>
+
+      <hr />
+
+      <h2 className="section-title">Location</h2>
+      <div className="form-field-group">
+        <label>Address</label>
+        <input
+          placeholder="2712 Broadway St"
+          value={resume.basics.location.address}
+          onChange={(e) => handleLocationChange("address", e.target.value)}
+        />
+      </div>
+      <div className="form-field-group">
+        <label>City</label>
+        <input
+          placeholder="San Francisco"
+          value={resume.basics.location.city}
+          onChange={(e) => handleLocationChange("city", e.target.value)}
+        />
+      </div>
+      <div className="form-field-group">
+        <label>Region</label>
+        <input
+          placeholder="California"
+          value={resume.basics.location.region}
+          onChange={(e) => handleLocationChange("region", e.target.value)}
+        />
+      </div>
+      <div className="form-field-group">
+        <label>Country Code</label>
+        <input
+          placeholder="US"
+          value={resume.basics.location.countryCode}
+          onChange={(e) => handleLocationChange("countryCode", e.target.value)}
+        />
+      </div>
+      <div className="form-field-group">
+        <label>Postal Code</label>
+        <input
+          placeholder="CA 94115"
+          value={resume.basics.location.postalCode}
+          onChange={(e) => handleLocationChange("postalCode", e.target.value)}
+        />
+      </div>
+
+      <hr />
+
+      <h2 className="section-title">Profiles</h2>
       {resume.basics.profiles.map((profile, i) => (
-        <div key={i} className="profile-input-group">
-          <label>{profile.network} URL:</label>
-          <input
-            type="text"
-            value={profile.url}
-            onChange={(e) => handleProfileChange(i, e.target.value)}
-          />
+        <div key={i} className="profile-input-group list-item compact">
+          <div className="form-field-group">
+            <label>Network</label>
+            <input
+              placeholder="Twitter"
+              type="text"
+              value={profile.network}
+              onChange={(e) => handleProfileChange(i, profile.url, e.target.value)}
+            />
+          </div>
+          <div className="form-field-group">
+            <label>URL</label>
+            <input
+              placeholder="https://twitter.com/john"
+              type="text"
+              value={profile.url}
+              onChange={(e) => handleProfileChange(i, e.target.value, profile.network)}
+            />
+          </div>
+          <div className="item-actions">
+            <button className="button button-danger" onClick={() => handleDeleteProfile(i)}>Delete</button>
+          </div>
         </div>
       ))}
+      <button className="button button-secondary add-button" onClick={handleAddProfile}>
+        + Add Profile
+      </button>
+
       <hr />
 
       <h2 className="section-title">Education</h2>
@@ -239,15 +429,15 @@ export const ResumeEditor: React.FC = () => {
 
       <hr />
 
-      <h2 className="section-title">Experience</h2>
-      <ExperienceList
-        experiences={resume.experience}
+      <h2 className="section-title">Work Experience</h2>
+      <WorkList
+        experiences={resume.work}
         onEdit={handleEditExperience}
         onDelete={handleDeleteExperience}
         onShowBullets={handleShowBullets}
       />
       <button className="button button-primary add-button" onClick={() => { setIsExperienceModalOpen(true); setEditingExp(null); }}>
-        + Add Experience
+        + Add Work Experience
       </button>
 
       <hr />
@@ -265,6 +455,19 @@ export const ResumeEditor: React.FC = () => {
       
       <hr />
       
+      <h2 className="section-title">Skills</h2>
+      <SkillList
+        skills={resume.skills}
+        onEdit={handleEditSkill}
+        onDelete={handleDeleteSkill}
+        onShowBullets={handleShowBullets}
+      />
+      <button className="button button-primary add-button" onClick={() => { setIsSkillModalOpen(true); setEditingSkill(null); }}>
+        + Add Skill
+      </button>
+
+      <hr />
+
       <div className="button-group">
         <button className="button button-secondary" onClick={handleSaveToBrowser}>
           💾 Save to Browser
@@ -276,10 +479,10 @@ export const ResumeEditor: React.FC = () => {
 
       <Modal
         isOpen={isExperienceModalOpen}
-        title={editingExp ? "Edit Experience" : "Add Experience"}
-        onClose={() => setIsExperienceModalOpen(false)}
+        title={editingExp ? "Edit Work Experience" : "Add Work Experience"}
+        onClose={() => { setIsExperienceModalOpen(false); setEditingExp(null); }}
       >
-        <ExperienceForm
+        <WorkForm
           initialData={editingExp || undefined}
           onSave={handleSaveExperience}
         />
@@ -288,7 +491,7 @@ export const ResumeEditor: React.FC = () => {
       <Modal
         isOpen={isProjectModalOpen}
         title={editingProject ? "Edit Project" : "Add Project"}
-        onClose={() => setIsProjectModalOpen(false)}
+        onClose={() => { setIsProjectModalOpen(false); setEditingProject(null); }}
       >
         <ProjectForm
           initialData={editingProject || undefined}
@@ -299,18 +502,29 @@ export const ResumeEditor: React.FC = () => {
       <Modal
         isOpen={isEducationModalOpen}
         title={editingEducation ? "Edit Education" : "Add Education"}
-        onClose={() => setIsEducationModalOpen(false)}
+        onClose={() => { setIsEducationModalOpen(false); setEditingEducation(null); }}
       >
         <EducationForm
           initialData={editingEducation || undefined}
           onSave={handleSaveEducation}
         />
       </Modal>
+      
+      <Modal
+        isOpen={isSkillModalOpen}
+        title={editingSkill ? "Edit Skill" : "Add Skill"}
+        onClose={() => { setIsSkillModalOpen(false); setEditingSkill(null); }}
+      >
+        <SkillForm
+          initialData={editingSkill || undefined}
+          onSave={handleSaveSkill}
+        />
+      </Modal>
 
       <Modal
         isOpen={isBulletPointModalOpen}
         title={bulletModalTitle}
-        onClose={() => setIsBulletPointModalOpen(false)}
+        onClose={() => setIsBulletPointModal(false)}
       >
         <BulletPointModal bullets={currentBullets} />
       </Modal>

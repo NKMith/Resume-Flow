@@ -13,12 +13,13 @@ export default function ProjectList({ projects, onEdit, onDelete, onShowBullets 
     <div>
       {projects.map((proj) => (
         <div key={proj.id} className="list-item">
-          <h4>{proj.title}</h4>
+          <h4>{proj.name}</h4>
+          <p>{proj.url}</p>
           <p>{proj.startDate} — {proj.endDate}</p>
           <div className="item-actions">
             <button className="button button-secondary" onClick={() => onEdit(proj)}>Edit</button>
             <button className="button button-danger" onClick={() => onDelete(proj.id)}>Delete</button>
-            <button className="button button-secondary" onClick={() => onShowBullets(proj.highlights, `${proj.title} Highlights`)}>Show Bullets</button>
+            <button className="button button-secondary" onClick={() => onShowBullets(proj.highlights, `${proj.name} Highlights`)}>Show Highlights</button>
           </div>
         </div>
       ))}
