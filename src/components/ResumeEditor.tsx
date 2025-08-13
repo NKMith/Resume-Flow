@@ -9,6 +9,7 @@ import type { Project } from "../types";
 import { EducationForm } from "./EducationForm";
 import { EducationList } from "./EducationList";
 import type { Education } from "../types";
+import { BulletPointModal } from "./BulletPointModal";
 
 
 
@@ -45,6 +46,10 @@ export const ResumeEditor: React.FC = () => {
 
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState<Education | null>(null);
+
+  const [isBulletPointModalOpen, setIsBulletPointModalOpen] = useState(false);
+  const [currentBullets, setCurrentBullets] = useState<string[]>([]);
+  const [bulletModalTitle, setBulletModalTitle] = useState("");
 
   // Load saved resume from localStorage on mount
   useEffect(() => {
@@ -94,6 +99,13 @@ export const ResumeEditor: React.FC = () => {
     });
     setIsEducationModalOpen(false);
     setEditingEducation(null);
+  };
+
+  // Function to show the bullet point modal
+  const handleShowBullets = (bullets: string[], title: string) => {
+    setCurrentBullets(bullets);
+    setBulletModalTitle(title);
+    setIsBulletPointModalOpen(true);
   };
 
   const handleFieldChange = (field: keyof Resume, value: string) => {
@@ -190,6 +202,7 @@ export const ResumeEditor: React.FC = () => {
           setIsExperienceModalOpen(true);
         }}
         onDelete={handleDeleteExperience} 
+        onShowBullets={handleShowBullets} // Pass the new handler
       />
       <button onClick={() => setIsExperienceModalOpen(true)}>+ Add Experience</button>
 
@@ -202,6 +215,7 @@ export const ResumeEditor: React.FC = () => {
         }}
         // Pass the delete function as a prop
         onDelete={handleDeleteProject}
+        onShowBullets={handleShowBullets} // Pass the new handler
       />
       <button onClick={() => setIsProjectModalOpen(true)}>+ Add Project</button>
       <hr />
@@ -243,6 +257,17 @@ export const ResumeEditor: React.FC = () => {
           onSave={handleSaveEducation}
         />
       </Modal>
+
+      <BulletPointModal
+        isOpen={isBulletPointModalOpen}
+        onClose={() => {
+          setIsBulletPointModalOpen(false);
+          setCurrentBullets([]);
+          setBulletModalTitle("");
+        }}
+        title={bulletModalTitle}
+        bullets={currentBullets}
+      />
     </div>
   );
 };

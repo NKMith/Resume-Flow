@@ -6,9 +6,10 @@ interface ProjectListProps {
   onEdit: (project: Project) => void;
 //   onDelete: (id: string) => void;
   onDelete: (id: string) => void;
+  onShowBullets: (bullets: string[], title: string) => void;
 }
 
-export default function ProjectList({ projects, onEdit, onDelete }: ProjectListProps) {
+export default function ProjectList({ projects, onEdit, onDelete, onShowBullets }: ProjectListProps) {
   return (
     <div>
       {projects.map((proj) => (
@@ -21,6 +22,7 @@ export default function ProjectList({ projects, onEdit, onDelete }: ProjectListP
           </ul>
           <button onClick={() => onEdit(proj)}>Edit</button>
           <button onClick={() => onDelete(proj.id)}>Delete</button>
+          <button onClick={() => onShowBullets(proj.highlights, `${proj.title} Highlights`)}>Show Bullets</button>
         </div>
       ))}
     </div>

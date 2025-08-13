@@ -6,9 +6,10 @@ interface Props {
   onEdit: (exp: Experience) => void;
   // Add onDelete prop
   onDelete: (id: string) => void;
+  onShowBullets: (bullets: string[], title: string) => void;
 }
 
-export const ExperienceList: React.FC<Props> = ({ experiences, onEdit, onDelete }) => {
+export const ExperienceList: React.FC<Props> = ({ experiences, onEdit, onDelete, onShowBullets }) => {
   return (
     <div>
       {experiences.map((exp) => (
@@ -21,6 +22,7 @@ export const ExperienceList: React.FC<Props> = ({ experiences, onEdit, onDelete 
           </ul>
           <button onClick={() => onEdit(exp)}>Edit</button>
           <button onClick={() => onDelete(exp.id)}>Delete</button>
+          <button onClick={() => onShowBullets(exp.highlights, `${exp.title} Highlights`)}>Show Bullets</button>
         </div>
       ))}
     </div>
