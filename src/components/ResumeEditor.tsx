@@ -11,8 +11,6 @@ import { EducationList } from "./EducationList";
 import type { Education } from "../types";
 import { BulletPointModal } from "./BulletPointModal";
 
-
-
 function extractUsername(url: string) {
   try {
     const parsed = new URL(url.trim());
@@ -68,7 +66,7 @@ export const ResumeEditor: React.FC = () => {
     setResume((prev) => {
       const exists = prev.experience.some((e) => e.id === exp.id);
       const updatedExperience = exists
-        ? prev.experience.map((e) => (e.id === exp.id ? e : e))
+        ? prev.experience.map((e) => (e.id === exp.id ? exp : e))
         : [...prev.experience, exp];
       return { ...prev, experience: updatedExperience };
     });
@@ -85,7 +83,7 @@ export const ResumeEditor: React.FC = () => {
     setResume((prev) => {
       const exists = prev.projects.some((p) => p.id === proj.id);
       const updatedProjects = exists
-        ? prev.projects.map((p) => (p.id === proj.id ? p : p))
+        ? prev.projects.map((p) => (p.id === proj.id ? proj : p))
         : [...prev.projects, proj];
       return { ...prev, projects: updatedProjects };
     });
@@ -170,10 +168,13 @@ export const ResumeEditor: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const saveResume = () => {
+  const handleSaveToBrowser = () => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(resume));
+    alert("Resume saved to your browser's local storage!");
+  };
+
+  const handleDownload = () => {
     downloadJsonFile(resume, "resume.json");
-    alert("Resume saved locally and downloaded as resume.json");
   };
 
   return (
@@ -246,9 +247,16 @@ export const ResumeEditor: React.FC = () => {
       </button>
       
       <hr />
-      <button className="button button-primary" onClick={saveResume}>
-        💾 Save Resume
-      </button>
+      
+      {/* New buttons for save and download */}
+      <div className="button-group">
+        <button className="button button-secondary" onClick={handleSaveToBrowser}>
+          💾 Save to Browser
+        </button>
+        <button className="button button-primary" onClick={handleDownload}>
+          Download Resume
+        </button>
+      </div>
 
       <Modal
         isOpen={isExperienceModalOpen}
