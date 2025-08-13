@@ -20,7 +20,7 @@ export const ExperienceForm: React.FC<Props> = ({ initialData, onSave }) => {
       setCompany(initialData.company);
       setStartDate(initialData.startDate || "");
       setEndDate(initialData.endDate || "");
-      setBullets(initialData.highlights);
+      setBullets(initialData.highlights || []);
     }
   }, [initialData]);
 

@@ -39,7 +39,7 @@ export const ResumeEditor: React.FC = () => {
     education: []
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [editingExp, setEditingExp] = useState<Experience | null>(null);
 
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -69,7 +69,7 @@ export const ResumeEditor: React.FC = () => {
         : [...prev.experience, exp];
       return { ...prev, experience: updatedExperience };
     });
-    setIsModalOpen(false);
+    setIsExperienceModalOpen(false);
     setEditingExp(null);
   };
 
@@ -173,32 +173,28 @@ export const ResumeEditor: React.FC = () => {
         experiences={resume.experience}
         onEdit={(exp) => {
           setEditingExp(exp);
-          setIsModalOpen(true);
+          setIsExperienceModalOpen(true);
         }}
       />
-      <button onClick={() => setIsModalOpen(true)}>+ Add Experience</button>
+      <button onClick={() => setIsExperienceModalOpen(true)}>+ Add Experience</button>
 
       <h2>Projects</h2>
-        <ProjectList
-          projects={resume.projects}
-          onEdit={(proj) => {
-            setEditingProject(proj);
-            setIsProjectModalOpen(true);
-          }}
-        />
-        <button onClick={() => setIsProjectModalOpen(true)}>+ Add Project</button>
-
-        
-
-
+      <ProjectList
+        projects={resume.projects}
+        onEdit={(proj) => {
+          setEditingProject(proj);
+          setIsProjectModalOpen(true);
+        }}
+      />
+      <button onClick={() => setIsProjectModalOpen(true)}>+ Add Project</button>
       <hr />
       <button onClick={saveResume}>💾 Save Resume</button>
 
       <Modal
-        isOpen={isModalOpen}
+        isOpen={isExperienceModalOpen}
         title={editingExp ? "Edit Experience" : "Add Experience"}
         onClose={() => {
-          setIsModalOpen(false);
+          setIsExperienceModalOpen(false);
           setEditingExp(null);
         }}
       >
