@@ -16,7 +16,7 @@ export const ExperienceForm: React.FC<Props> = ({ initialData, onSave }) => {
 
   useEffect(() => {
     if (initialData) {
-      setTitle(initialData.title);
+      setTitle(initialData.position);
       setCompany(initialData.company);
       setStartDate(initialData.startDate || "");
       setEndDate(initialData.endDate || "");
@@ -57,7 +57,7 @@ export const ExperienceForm: React.FC<Props> = ({ initialData, onSave }) => {
   const handleSubmit = () => {
     onSave({
       id: initialData?.id || Date.now().toString(),
-      title,
+      position: title,
       company,
       startDate,
       endDate,

@@ -25,12 +25,15 @@ const LOCAL_STORAGE_KEY = "my_resume_data";
 
 export const ResumeEditor: React.FC = () => {
   const [resume, setResume] = useState<Resume>({
-    name: "Your Name",
-    email: "email@example.com",
-    profiles: [
-      { network: "GitHub", username: "you", url: "https://github.com/you" },
-      { network: "LinkedIn", username: "you", url: "https://linkedin.com/in/you" }
-    ],
+    // Updated to use the new `basics` object
+    basics: {
+      name: "Your Name",
+      email: "email@example.com",
+      profiles: [
+        { network: "GitHub", username: "you", url: "https://github.com/you" },
+        { network: "LinkedIn", username: "you", url: "https://linkedin.com/in/you" }
+      ],
+    },
     experience: [],
     projects: [],
     education: []
@@ -49,7 +52,6 @@ export const ResumeEditor: React.FC = () => {
   const [currentBullets, setCurrentBullets] = useState<string[]>([]);
   const [bulletModalTitle, setBulletModalTitle] = useState("");
 
-  // Load saved resume from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (saved) {
@@ -119,19 +121,33 @@ export const ResumeEditor: React.FC = () => {
     setIsBulletPointModalOpen(true);
   };
 
-  const handleFieldChange = (field: keyof Resume, value: string) => {
-    setResume((prev) => ({ ...prev, [field]: value }));
+  // New function to handle changes to the `basics` object
+  const handleBasicsChange = (field: keyof typeof resume.basics, value: string) => {
+    setResume((prev) => ({
+      ...prev,
+      basics: {
+        ...prev.basics,
+        [field]: value
+      }
+    }));
   };
 
+  // Updated function to handle changes to `profiles`
   const handleProfileChange = (index: number, newUrl: string) => {
     setResume((prev) => {
-      const updatedProfiles = [...prev.profiles];
+      const updatedProfiles = [...prev.basics.profiles];
       updatedProfiles[index] = {
         ...updatedProfiles[index],
         url: newUrl,
         username: extractUsername(newUrl),
       };
-      return { ...prev, profiles: updatedProfiles };
+      return {
+        ...prev,
+        basics: {
+          ...prev.basics,
+          profiles: updatedProfiles
+        }
+      };
     });
   };
 
@@ -183,9 +199,9 @@ export const ResumeEditor: React.FC = () => {
         className="editable-text"
         contentEditable
         suppressContentEditableWarning
-        onBlur={(e) => handleFieldChange("name", e.currentTarget.textContent || "")}
+        onBlur={(e) => handleBasicsChange("name", e.currentTarget.textContent || "")}
       >
-        {resume.name}
+        {resume.basics.name}
       </h1>
       <div className="contact-info">
         <label>Email:</label>
@@ -193,12 +209,12 @@ export const ResumeEditor: React.FC = () => {
           className="editable-text"
           contentEditable
           suppressContentEditableWarning
-          onBlur={(e) => handleFieldChange("email", e.currentTarget.textContent || "")}
+          onBlur={(e) => handleBasicsChange("email", e.currentTarget.textContent || "")}
         >
-          {resume.email}
+          {resume.basics.email}
         </span>
       </div>
-      {resume.profiles.map((profile, i) => (
+      {resume.basics.profiles.map((profile, i) => (
         <div key={i} className="profile-input-group">
           <label>{profile.network} URL:</label>
           <input
@@ -215,7 +231,7 @@ export const ResumeEditor: React.FC = () => {
         education={resume.education || []}
         onEdit={handleEditEducation}
         onDelete={handleDeleteEducation}
-        onShowBullets={handleShowBullets} // Added this prop
+        onShowBullets={handleShowBullets}
       />
       <button className="button button-primary add-button" onClick={() => { setIsEducationModalOpen(true); setEditingEducation(null); }}>
         + Add Education
@@ -249,13 +265,12 @@ export const ResumeEditor: React.FC = () => {
       
       <hr />
       
-      {/* New buttons for save and download */}
       <div className="button-group">
         <button className="button button-secondary" onClick={handleSaveToBrowser}>
           💾 Save to Browser
         </button>
         <button className="button button-primary" onClick={handleDownload}>
-          Download Resume
+          Download Resume JSON
         </button>
       </div>
 
