@@ -215,6 +215,7 @@ export const ResumeEditor: React.FC = () => {
         education={resume.education || []}
         onEdit={handleEditEducation}
         onDelete={handleDeleteEducation}
+        onShowBullets={handleShowBullets} // Added this prop
       />
       <button className="button button-primary add-button" onClick={() => { setIsEducationModalOpen(true); setEditingEducation(null); }}>
         + Add Education

@@ -57,19 +57,27 @@ export const EducationForm: React.FC<Props> = ({ initialData, onSave }) => {
 
   return (
     <div>
-      <label>Institution</label>
-      <input value={institution} onChange={(e) => setInstitution(e.target.value)} />
+      <div className="form-field-group">
+        <label>Institution</label>
+        <input value={institution} onChange={(e) => setInstitution(e.target.value)} />
+      </div>
 
-      <label>URL</label>
-      <input value={url} onChange={(e) => setUrl(e.target.value)} />
+      <div className="form-field-group">
+        <label>URL</label>
+        <input value={url} onChange={(e) => setUrl(e.target.value)} />
+      </div>
 
-      <label>Area</label>
-      <input value={area} onChange={(e) => setArea(e.target.value)} />
+      <div className="form-field-group">
+        <label>Area</label>
+        <input value={area} onChange={(e) => setArea(e.target.value)} />
+      </div>
 
-      <label>Study Type</label>
-      <input value={studyType} onChange={(e) => setStudyType(e.target.value)} />
+      <div className="form-field-group">
+        <label>Study Type</label>
+        <input value={studyType} onChange={(e) => setStudyType(e.target.value)} />
+      </div>
 
-      <div className="date-fields">
+      <div className="date-fields form-field-group">
         <div className="date-field-group">
           <label>Start Date</label>
           <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
@@ -80,22 +88,26 @@ export const EducationForm: React.FC<Props> = ({ initialData, onSave }) => {
         </div>
       </div>
 
-      <label>Score</label>
-      <input value={score} onChange={(e) => setScore(e.target.value)} />
+      <div className="form-field-group">
+        <label>Score</label>
+        <input value={score} onChange={(e) => setScore(e.target.value)} />
+      </div>
 
-      <label>Courses</label>
-      <div className="bullets-container">
-        {courses.map((course, i) => (
-          <div key={i} className="bullet-wrapper">
-            <input
-              value={course}
-              onChange={(e) => updateCourse(i, e.target.value)}
-              className="bullet-point-input"
-            />
-            <button type="button" className="delete-bullet-btn" onClick={() => deleteCourse(i)}>🗑️</button>
-          </div>
-        ))}
-        <button type="button" className="button button-secondary add-button" onClick={addCourse}>+ Add Course</button>
+      <div className="form-field-group">
+        <label>Courses</label>
+        <div className="bullets-container">
+          {courses.map((course, i) => (
+            <div key={i} className="bullet-wrapper">
+              <input
+                value={course}
+                onChange={(e) => updateCourse(i, e.target.value)}
+                className="bullet-point-input"
+              />
+              <button type="button" className="delete-bullet-btn" onClick={() => deleteCourse(i)}>🗑️</button>
+            </div>
+          ))}
+          <button type="button" className="button button-secondary add-button" onClick={addCourse}>+ Add Course</button>
+        </div>
       </div>
 
       <div className="button-group">
