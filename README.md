@@ -5,8 +5,7 @@ Solution: Resume Flow allows you to centralize and organize your resume data in 
 
 
 
-### For Developers
-Instructions for setup:
+## Instructions for setup:
 
 1. Run `npm install`
 
@@ -16,7 +15,7 @@ You should now be set. To run, you just need to run the following command
 
 To have this accessible via Github Pages, I'd recommend looking into website deployment (with React) (with github pages probably as well, its different from hosting the website urself)
 
-# React + TypeScript + Vite
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -25,7 +24,7 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+### Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
