@@ -1,5 +1,5 @@
 # Resume Flow
-Problem: it's hard to organize your resume data. For instance, suppose you have multiple versions of your resume to submit to apply to different versions. If you make a change to one of your data, you have to manually change every single other versions as well. 
+Problem: it's hard to organize your resume data. For instance, suppose you have multiple versions of your resume to submit to apply to different positions. If you make a change to one of your data, you have to manually change every single other version as well. 
 
 Solution: Resume Flow allows you to centralize and organize your resume data in one place. It will be able to save your data in [JSONResume](https://jsonresume.org/) schema. You can use tools to automatically generate your resumes, apply changes easily across different platforms programmatically using the JSON(such as your portfolio site), or simply customize what you are going to copy and paste into a document or Linkedin.
 
