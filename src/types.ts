@@ -120,6 +120,15 @@ export interface Project {
   url: string;
 }
 
+export interface Award {
+  id: string;
+  title: string;
+  date: string;
+  awarder: string;
+  summary: string;
+}
+
+
 export interface Resume {
   basics: Basics;
   work: Work[];

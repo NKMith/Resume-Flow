@@ -12,6 +12,10 @@ import { EducationList } from "./EducationList";
 import { BulletPointModal } from "./BulletPointModal";
 import { SkillForm } from "./SkillForm";
 import { SkillList } from "./SkillList";
+import { AwardForm } from "./AwardForm";
+import { AwardList } from "./AwardList";
+import type { Award } from "../types";
+
 
 function extractUsername(url: string) {
   try {
@@ -77,15 +81,41 @@ export const ResumeEditor: React.FC = () => {
   const [currentBullets, setCurrentBullets] = useState<string[]>([]);
   const [bulletModalTitle, setBulletModalTitle] = useState("");
 
+  const [isAwardModalOpen, setIsAwardModalOpen] = useState(false);
+  const [editingAward, setEditingAward] = useState<Award | null>(null);
+
+  const handleSaveAward = (award: Award) => {
+    setResume((prev) => {
+      const exists = prev.awards?.some((a) => a.id === award.id);
+      const updatedAwards = exists
+        ? prev.awards.map((a) => (a.id === award.id ? award : a))
+        : [...(prev.awards || []), award];
+      return { ...prev, awards: updatedAwards };
+    });
+    setIsAwardModalOpen(false);
+    setEditingAward(null);
+  };
+
+  const handleEditAward = (award: Award) => {
+    setEditingAward(award);
+    setIsAwardModalOpen(true);
+  };
+
+  const handleDeleteAward = (id: string) => {
+    setResume((prev) => ({
+      ...prev,
+      awards: prev.awards?.filter((a) => a.id !== id) || [],
+    }));
+  };
+
   useEffect(() => {
-    // const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    const saved = null;
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (saved) {
       try {
         const parsed: Resume = JSON.parse(saved);
         setResume(parsed);
       } catch (e) {
-        console.error("Failed to parse saved resume from localStorage", e);
+        console.error("Failed to parse saved resume from localStorage; using default values", e);
       }
     }
   }, []);
@@ -454,7 +484,22 @@ export const ResumeEditor: React.FC = () => {
       </button>
       
       <hr />
+      <h2 className="section-title">Awards</h2>
+      <AwardList
+        awards={resume.awards || []}
+        onEdit={handleEditAward}
+        onDelete={handleDeleteAward}
+      />
+      <button
+        className="button button-primary add-button"
+        onClick={() => { setIsAwardModalOpen(true); setEditingAward(null); }}
+      >
+        + Add Award
+      </button>
       
+      
+      <hr />
+
       <h2 className="section-title">Skills</h2>
       <SkillList
         skills={resume.skills}
@@ -527,6 +572,17 @@ export const ResumeEditor: React.FC = () => {
         onClose={() => setIsBulletPointModal(false)}
       >
         <BulletPointModal bullets={currentBullets} />
+      </Modal>
+
+      <Modal
+        isOpen={isAwardModalOpen}
+        title={editingAward ? "Edit Award" : "Add Award"}
+        onClose={() => { setIsAwardModalOpen(false); setEditingAward(null); }}
+      >
+        <AwardForm
+          initialData={editingAward || undefined}
+          onSave={handleSaveAward}
+        />
       </Modal>
     </div>
   );
